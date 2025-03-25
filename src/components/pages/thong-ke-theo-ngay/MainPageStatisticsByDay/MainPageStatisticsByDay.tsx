@@ -2,63 +2,39 @@ import React, {useEffect, useState} from 'react';
 
 import {PropsMainPageStatisticsByDay} from './interfaces';
 import styles from './MainPageStatisticsByDay.module.scss';
-import Pagination from '~/components/common/Pagination';
 import DataWrapper from '~/components/common/DataWrapper';
-import FilterCustom from '~/components/common/FilterCustom';
 import {
 	CONFIG_DESCENDING,
 	CONFIG_PAGING,
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
-	STATUS_CONFIRM,
-	TYPE_BATCH,
-	TYPE_CUSTOMER,
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
 	TYPE_PARTNER,
-	TYPE_PRODUCT,
 } from '~/constants/config/enum';
-import Search from '~/components/common/Search';
-import Button from '~/components/common/Button';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {httpRequest} from '~/services';
-import wareServices from '~/services/wareServices';
 import customerServices from '~/services/customerServices';
 import {useRouter} from 'next/router';
 import Table from '~/components/common/Table';
 import Noti from '~/components/common/DataWrapper/components/Noti';
-import {convertWeight, formatDrynessAvg, timeSubmit} from '~/common/funcs/optionConvert';
-import TippyHeadless from '@tippyjs/react/headless';
-import Moment from 'react-moment';
-import {convertCoin} from '~/common/funcs/convertCoin';
+import {convertWeight} from '~/common/funcs/optionConvert';
+
 import Link from 'next/link';
-import Tippy from '@tippyjs/react/headless';
-import clsx from 'clsx';
-import IconCustom from '~/components/common/IconCustom';
-import {CloseCircle, TickCircle} from 'iconsax-react';
-import Dialog from '~/components/common/Dialog';
 import batchBillServices from '~/services/batchBillServices';
-import fixDrynessServices from '~/services/fixDrynessServices';
-import Popup from '~/components/common/Popup';
-import StateActive from '~/components/common/StateActive';
-import SelectFilterState from '~/components/common/SelectFilterState';
 import companyServices from '~/services/companyServices';
 import SelectFilterMany from '~/components/common/SelectFilterMany';
 import partnerServices from '~/services/partnerServices';
 import storageServices from '~/services/storageServices';
 import DateRangerCustom from '~/components/common/DateRangerCustom';
 import moment from 'moment';
-import Loading from '~/components/common/Loading';
 
 function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const router = useRouter();
 
-	const queryClient = useQueryClient();
-
 	const {_userOwnerUuid, _partnerUuid, _dateFrom, _dateTo} = router.query;
 
-	const [uuidDescription, setUuidDescription] = useState<string>('');
 	const [listStatisticsByDay, setListStatisticsByDay] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [uuidCompany, setUuidCompany] = useState<string>('');
@@ -66,7 +42,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const [uuidStorage, setUuidStorage] = useState<string>('');
 	const [listCompanyUuid, setListCompanyUuid] = useState<any[]>([]);
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
-	const [total, setTotal] = useState<number>(0);
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
 		queryFn: () =>
