@@ -54,11 +54,8 @@ import Loading from '~/components/common/Loading';
 function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const router = useRouter();
 
-	const queryClient = useQueryClient();
-
 	const {_userOwnerUuid, _partnerUuid, _dateFrom, _dateTo} = router.query;
 
-	const [uuidDescription, setUuidDescription] = useState<string>('');
 	const [listStatisticsByDay, setListStatisticsByDay] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [uuidCompany, setUuidCompany] = useState<string>('');
@@ -66,7 +63,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const [uuidStorage, setUuidStorage] = useState<string>('');
 	const [listCompanyUuid, setListCompanyUuid] = useState<any[]>([]);
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
-	const [total, setTotal] = useState<number>(0);
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
 		queryFn: () =>
