@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {PropsDashboardWarehouse} from './interfaces';
 import styles from './DashboardWarehouse.module.scss';
@@ -8,9 +8,28 @@ import ItemDashboard from './components/ItemDashboard';
 import ItemInfoChart from './components/ItemInfoChart';
 import ChartDashboard from './components/ChartDashboard';
 import Link from 'next/link';
+import {CONFIG_DESCENDING, CONFIG_PAGING, CONFIG_STATUS, CONFIG_TYPE_FIND, QUERY_KEY, TYPE_PRODUCT} from '~/constants/config/enum';
+import {useQuery} from '@tanstack/react-query';
+import {httpRequest} from '~/services';
+import companyServices from '~/services/companyServices';
+import SelectFilterOption from '../../trang-chu/SelectFilterOption';
+import {set} from 'nprogress';
+import {useSelector} from 'react-redux';
+import {RootState} from '~/redux/store';
 
-function DashboardWarehouse({isTotal, total, productTotal, qualityTotal, specTotal, dataWarehouse}: PropsDashboardWarehouse) {
+function DashboardWarehouse({
+	isTotal,
+	total,
+	productTotal,
+	qualityTotal,
+	specTotal,
+	dataWarehouse,
+	setUuidCompany,
+	setUuidTypeProduct,
+}: PropsDashboardWarehouse) {
 	const [arrayTypeAction, setArrayTypeAction] = useState<('product' | 'quality' | 'spec')[]>(['product', 'quality', 'spec']);
+
+	const {infoUser} = useSelector((state: RootState) => state.user);
 
 	const handleAction = (key: 'product' | 'quality' | 'spec') => {
 		if (arrayTypeAction.some((v) => v == key)) {
@@ -19,6 +38,55 @@ function DashboardWarehouse({isTotal, total, productTotal, qualityTotal, specTot
 			setArrayTypeAction((prev) => [...prev, key]);
 		}
 	};
+
+	const [uuidCompany, setUuidCompanyFilter] = useState<string>('');
+	const [nameCompany, setNameCompanyFilter] = useState<string>('');
+	const [typeProduct, setTypeProduct] = useState<number>(TYPE_PRODUCT.CONG_TY);
+
+	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: companyServices.listCompany({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	useEffect(() => {
+		if (setUuidCompany) {
+			setUuidCompany(uuidCompany);
+		}
+		if (setUuidTypeProduct) {
+			setUuidTypeProduct(typeProduct);
+		}
+	}, [uuidCompany, typeProduct]);
+
+	const uuidCompanyDefault = '';
+	// const uuidCompanyDefault = '622f5955-5add-4490-8868-7d9ed1fa3e72';
+	useEffect(() => {
+		if (uuidCompanyDefault && infoUser?.companyUuid == null) {
+			setUuidCompanyFilter(uuidCompanyDefault);
+			const name = listCompany?.data?.find((v: any) => v?.uuid == uuidCompanyDefault)?.name;
+			setNameCompanyFilter(name);
+		}
+		if (uuidCompanyDefault && infoUser?.companyUuid != null) {
+			setUuidCompanyFilter(infoUser?.companyUuid);
+			const name = listCompany?.data?.find((v: any) => v?.uuid == infoUser?.companyUuid)?.name;
+			setNameCompanyFilter(name);
+		}
+	}, [uuidCompanyDefault, infoUser?.companyUuid]);
+
+	// ${nameCompany}
 
 	return (
 		<div className={clsx(styles.container, {[styles.isTotal]: isTotal})}>
@@ -29,8 +97,39 @@ function DashboardWarehouse({isTotal, total, productTotal, qualityTotal, specTot
 							<ChartSquare size='28' color='#fff' variant='Bold' />
 						</div>
 					)}
-					<h4 className={styles.title}>{isTotal ? 'Tổng kho Cái Lân' : dataWarehouse?.name}</h4>
+					<h4 className={styles.title}>{isTotal ? `Tổng kho ` : dataWarehouse?.name}</h4>
 				</div>
+
+				{isTotal && infoUser?.companyUuid == null && (
+					<div className={styles.filter_group}>
+						<div className={styles.input_price}>
+							<input
+								id={`state_type_product`}
+								name='state_type_product'
+								type='checkbox'
+								className={styles.input}
+								checked={typeProduct === TYPE_PRODUCT.CONG_TY}
+								onChange={(e) => setTypeProduct(e.target.checked ? TYPE_PRODUCT.CONG_TY : 0)}
+							/>
+							<label className={styles.label_check_box} htmlFor={`state_type_product`}>
+								Chỉ hiển thị hàng công ty
+							</label>
+						</div>
+						<div className={styles.filter}>
+							<SelectFilterOption
+								uuid={uuidCompany}
+								setUuid={setUuidCompanyFilter}
+								setName={setNameCompanyFilter}
+								listData={listCompany?.data?.map((v: any) => ({
+									uuid: v?.uuid,
+									name: v?.name,
+								}))}
+								placeholder='Tất cả kv cảng xuất khẩu'
+							/>
+						</div>
+					</div>
+				)}
+
 				{/* {!isTotal && (
 					<Link href={`/kho-hang/${dataWarehouse?.uuid}`} className={styles.link}>
 						Chi tiết kho hàng
@@ -56,6 +155,13 @@ function DashboardWarehouse({isTotal, total, productTotal, qualityTotal, specTot
 						value={isTotal ? total?.amountBDMT! : dataWarehouse?.amountBDMT!}
 						text='Khối lượng quy khô chuẩn (BDMT)'
 						background='#2DA2BC'
+					/>
+					<ItemDashboard
+						isTotal={isTotal}
+						value={isTotal ? total?.amountOutBDMT! : dataWarehouse?.amountOutBDMT!}
+						text='Khối lượng xuất tạm tính (BDMT)'
+						background='#e93a3a'
+						textColor='#e93a3a'
 					/>
 				</div>
 				<div className={styles.main_info}>

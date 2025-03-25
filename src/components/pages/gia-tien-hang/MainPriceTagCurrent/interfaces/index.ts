@@ -13,6 +13,11 @@ export interface IPriceTag {
 		code: string;
 		name: string;
 		uuid: string;
+		companyUu: {
+			code: string;
+			name: string;
+			uuid: string;
+		};
 	};
 	partnerUu: {
 		code: string;

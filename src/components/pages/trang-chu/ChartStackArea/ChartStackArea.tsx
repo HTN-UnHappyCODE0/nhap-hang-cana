@@ -18,6 +18,7 @@ import {
 	TYPE_CUSTOMER,
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
+	TYPE_PARTNER,
 	TYPE_PRODUCT,
 } from '~/constants/config/enum';
 import {httpRequest} from '~/services';
@@ -33,22 +34,26 @@ import {convertCoin} from '~/common/funcs/convertCoin';
 import wareServices from '~/services/wareServices';
 import Loading from '~/components/common/Loading';
 import commonServices from '~/services/commonServices';
+import SelectFilterMany from '../SelectFilterMany';
+import partnerServices from '~/services/partnerServices';
 
 function ChartStackArea({}: PropsChartStackArea) {
-	const [customerUuid, setCustomerUuid] = useState<string>('');
+	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
 	const [productUuid, setProductUuid] = useState<string>('');
 	const [userUuid, setUserUuid] = useState<string>('');
-	const [uuidCompany, setUuidCompanyFilter] = useState<string>('');
-	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.LAST_7_DAYS);
-	const [provinceUuid, setProvinceUuid] = useState<string>('');
+	const [uuidCompany, setUuidCompanyFilter] = useState<string[]>([]);
+	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.THIS_YEAR);
+	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
 	const [date, setDate] = useState<{
 		from: Date | null;
 		to: Date | null;
 	} | null>(null);
 	const [dataChart, setDataChart] = useState<any[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
+	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
+	const [uuidQuality, setUuidQuality] = useState<string>('');
 
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany], {
+	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, listPartnerUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -65,7 +70,50 @@ function ChartStackArea({}: PropsChartStackArea) {
 					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
 					provinceId: '',
 					specUuid: '',
-					companyUuid: uuidCompany,
+					listCompanyUuid: uuidCompany,
+					listPartnerUUid: listPartnerUuid,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: partnerServices.listPartner({
+					pageSize: 50,
+					page: 1,
+					keyword: '',
+					status: CONFIG_STATUS.HOAT_DONG,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					userUuid: '',
+					provinceId: '',
+					type: TYPE_PARTNER.NCC,
+					listCompanyUuid: uuidCompany,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listQuality({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
 				}),
 			}),
 		select(data) {
@@ -170,7 +218,17 @@ function ChartStackArea({}: PropsChartStackArea) {
 	});
 
 	const dataBoardDailyPrice = useQuery(
-		[QUERY_KEY.thong_ke_bieu_do_gia_tien_theo_ngay, productUuid, customerUuid, date, userUuid, uuidCompany, provinceUuid],
+		[
+			QUERY_KEY.thong_ke_bieu_do_gia_tien_theo_ngay,
+			productUuid,
+			customerUuid,
+			date,
+			userUuid,
+			uuidCompany,
+			listPartnerUuid,
+			provinceUuid,
+			uuidQuality,
+		],
 		{
 			queryFn: () =>
 				httpRequest({
@@ -179,37 +237,41 @@ function ChartStackArea({}: PropsChartStackArea) {
 						timeStart: timeSubmit(date?.from)!,
 						timeEnd: timeSubmit(date?.to, true)!,
 						userOwnerUuid: userUuid,
-						partnerUuid: '',
-						customerUuid: customerUuid,
-						companyUuid: uuidCompany,
-						transport_type: null,
+						transportType: null,
 						productTypeUuid: productUuid,
+						customerUuid: customerUuid,
+						listCompanyUuid: uuidCompany,
+						listPartnerUuid: listPartnerUuid,
 						provinceId: provinceUuid,
+						qualityUUid: uuidQuality,
 					}),
 				}),
 			onSuccess({data}) {
-				console.log('data', data);
 				// Convert data chart
-				const dataConvert = data?.chart?.map((v: any) => {
+				const dataConvert = data?.lstPriceDay?.map((v: any) => {
 					const date =
 						data?.typeShow == TYPE_DATE_SHOW.HOUR
-							? moment(v?.time).format('HH:mm')
+							? moment(v?.daily).format('HH:mm')
 							: data?.typeShow == TYPE_DATE_SHOW.DAY
-							? moment(v?.time).format('DD/MM')
+							? moment(v?.daily).format('DD/MM')
 							: data?.typeShow == TYPE_DATE_SHOW.MONTH
-							? moment(v?.time).format('MM-YYYY')
-							: moment(v?.time).format('YYYY');
+							? moment(v?.daily).format('MM-YYYY')
+							: moment(v?.daily).format('YYYY');
 
-					const obj = {
-						'Lớn nhất': v?.newDaily?.max || 0,
-						'Trung bình': v?.newDaily?.average || 0,
-						'Nhó nhất': v?.newDaily?.min || 0,
-						'Khách hàng': v?.newDaily?.customerLine || 0,
-						// [v?.newDaily?.customerLine?.productTypeDTO?.name]: v?.customerLine?.minAverage?.sumAmount || 0,
+					const objTotal = {
+						'Lớn nhất': v?.priceMax || 0,
+						'Trung bình': v?.priceAvg || 0,
+						'Nhỏ nhất': v?.priceMin || 0,
 					};
+
+					const obj = v?.customerPriceDTO?.reduce((acc: any, {customerUu, price}: {customerUu: any; price: number}) => {
+						acc[customerUu?.name] = price;
+						return acc;
+					}, {});
 
 					return {
 						name: date,
+						...objTotal,
 						...obj,
 					};
 				});
@@ -229,11 +291,10 @@ function ChartStackArea({}: PropsChartStackArea) {
 				// 		return acc;
 				// 	}, {});
 
-				const productColors = data?.chart
+				const productColors = data?.lstPriceDay
 					?.flatMap((v: any) => {
-						const maxAverage = v?.newDaily?.maxAverage;
-						const minAverage = v?.newDaily?.minAverage;
-						const customerLine = v?.newDaily?.customerLine;
+						const colors = ['#2CAE39', '#8A2BE2', '#FF4500', '#32CD32', '#FFD700', '#00CED1', '#FF1493'];
+						let colorIndex = 0;
 
 						return [
 							{
@@ -245,13 +306,14 @@ function ChartStackArea({}: PropsChartStackArea) {
 								fill: '#FF6838',
 							},
 							{
-								key: 'Nhó nhất',
+								key: 'Nhỏ nhất',
 								fill: '#2DA2BC',
 							},
-							{
-								key: 'Khách hàng',
-								fill: '#2CAE39',
-							},
+
+							...v?.customerPriceDTO.map((v: any) => ({
+								key: v?.customerUu.name,
+								fill: colors[colorIndex++ % colors.length],
+							})),
 						];
 					})
 					.reduce((acc: any, {key, fill}: {key: string; fill: string}) => {
@@ -261,10 +323,12 @@ function ChartStackArea({}: PropsChartStackArea) {
 						return acc;
 					}, {});
 
-				const productTypes = Object.entries(productColors).map(([key, fill]) => ({
-					key,
-					fill,
-				}));
+				const productTypes = productColors
+					? Object.entries(productColors).map(([key, fill]) => ({
+							key,
+							fill,
+					  }))
+					: [];
 
 				setProductTypes(productTypes);
 				setDataChart(dataConvert);
@@ -281,15 +345,15 @@ function ChartStackArea({}: PropsChartStackArea) {
 	);
 
 	const filteredProductTypes = useMemo(() => {
-		if (customerUuid === '') {
+		if (customerUuid?.length === 0) {
 			return productTypes.filter((v) => v.key !== 'Khách hàng');
 		}
 		return productTypes;
 	}, [customerUuid, productTypes]);
 
 	const filteredDataChart = useMemo(() => {
-		if (customerUuid === '') {
-			return dataChart.map((item) => {
+		if (customerUuid?.length === 0) {
+			return dataChart?.map((item) => {
 				const {'Khách hàng': _, ...rest} = item;
 				return rest;
 			});
@@ -299,38 +363,59 @@ function ChartStackArea({}: PropsChartStackArea) {
 
 	useEffect(() => {
 		if (uuidCompany) {
-			setCustomerUuid('');
+			setCustomerUuid([]);
+		}
+		if (listPartnerUuid) {
+			setCustomerUuid([]);
+		}
+	}, [uuidCompany, listPartnerUuid]);
+
+	useEffect(() => {
+		if (uuidCompany) {
+			setListPartnerUuid([]);
 		}
 	}, [uuidCompany]);
 
 	useEffect(() => {
 		if (listProductType?.data?.length > 0) {
-			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid);
+			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid); // để
 		}
 	}, [listProductType.data]);
+
+	console.log('abc', uuidCompany);
 
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
 				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
 				<div className={styles.filter}>
-					<SelectFilterOption
-						uuid={uuidCompany}
-						setUuid={setUuidCompanyFilter}
+					<SelectFilterMany
+						selectedIds={uuidCompany}
+						setSelectedIds={setUuidCompanyFilter}
 						listData={listCompany?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
 						placeholder='Tất cả kv cảng xuất khẩu'
 					/>
-					<SelectFilterOption
-						uuid={customerUuid}
-						setUuid={setCustomerUuid}
+					<SelectFilterMany
+						selectedIds={listPartnerUuid}
+						setSelectedIds={setListPartnerUuid}
+						listData={listPartner?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Công ty'
+					/>
+					<SelectFilterMany
+						isShowAll={false}
+						selectedIds={customerUuid}
+						setSelectedIds={setCustomerUuid}
 						listData={listCustomer?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Nhà cung cấp'
+						placeholder='Chọn nhà cung cấp'
 					/>
 					<SelectFilterOption
 						isShowAll={false}
@@ -358,14 +443,23 @@ function ChartStackArea({}: PropsChartStackArea) {
 						/>
 					</CheckRegencyCode>
 
-					<SelectFilterOption
-						uuid={provinceUuid}
-						setUuid={setProvinceUuid}
+					<SelectFilterMany
+						selectedIds={provinceUuid}
+						setSelectedIds={setProvinceUuid}
 						listData={listProvince?.data?.map((v: any) => ({
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
 						placeholder='Tất cả tỉnh thành'
+					/>
+					<SelectFilterOption
+						uuid={uuidQuality}
+						setUuid={setUuidQuality}
+						listData={listQuality?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Tất cả quốc gia'
 					/>
 				</div>
 			</div>
@@ -376,7 +470,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 						<div className={styles.circle} style={{borderColor: '#2A85FF'}}></div>
 					</div>
 					<div>
-						Lớn nhất:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.overview?.max)} (VNĐ)</span>
+						Lớn nhất:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.priceMax)} (VNĐ)</span>
 					</div>
 				</p>
 				<p className={styles.data_total}>
@@ -385,7 +479,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 						<div className={styles.circle} style={{borderColor: '#FF6838'}}></div>
 					</div>
 					<div>
-						Trung bình:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.overview?.averageAmount)} (VNĐ)</span>
+						Trung bình:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.priceAvg)} (VNĐ)</span>
 					</div>
 				</p>
 				<p className={styles.data_total}>
@@ -394,10 +488,10 @@ function ChartStackArea({}: PropsChartStackArea) {
 						<div className={styles.circle} style={{borderColor: '#2DA2BC'}}></div>
 					</div>
 					<div>
-						Nhỏ nhất:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.overview?.min)} (VNĐ)</span>
+						Nhỏ nhất:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.priceMin)} (VNĐ)</span>
 					</div>
 				</p>
-				<p className={styles.data_total}>
+				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2CAE39'}}></div>
 						<div className={styles.circle} style={{borderColor: '#2CAE39'}}></div>
@@ -405,14 +499,14 @@ function ChartStackArea({}: PropsChartStackArea) {
 					<div>
 						Khách hàng:<span>{convertCoin(dataBoardDailyPrice?.data?.data?.overview?.customerLine)} (VNĐ)</span>
 					</div>
-				</p>
+				</p> */}
 			</div>
 			<div className={styles.main_chart}>
 				<ResponsiveContainer width='100%' height='100%'>
 					<AreaChart
 						width={500}
 						height={300}
-						data={filteredDataChart}
+						data={dataChart}
 						margin={{
 							top: 8,
 							right: 8,
@@ -425,7 +519,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 						<YAxis domain={[2000000, 'dataMax']} tickFormatter={(value) => convertCoin(value)} />
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
-						{filteredProductTypes.map((v) => (
+						{productTypes.map((v) => (
 							<Area
 								key={v.key}
 								type='linear'

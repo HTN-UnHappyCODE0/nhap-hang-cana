@@ -125,7 +125,7 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 				isDropdown: true,
 				http: commonServices.listProvince({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 				}),
 			}),
 		select(data) {
@@ -139,7 +139,7 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 				isDropdown: true,
 				http: commonServices.listDistrict({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 					idParent: form?.provinceId,
 				}),
 			}),
@@ -155,7 +155,7 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 					idParent: form.districtId,
 				}),
 			}),

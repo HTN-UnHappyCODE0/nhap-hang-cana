@@ -3,7 +3,7 @@ import {createContext, useEffect, useRef, useState} from 'react';
 import {PropsSelector} from './interfaces';
 import clsx from 'clsx';
 import styles from './Select.module.scss';
-import {ArrowDown2} from 'iconsax-react';
+import {ArrowDown2, CloseCircle} from 'iconsax-react';
 import TippyHeadless from '@tippyjs/react/headless';
 
 export const ContextSelect = createContext<any>({});
@@ -116,9 +116,23 @@ function Select(props: PropsSelector) {
 							>
 								{props.value ? value?.title : props.placeholder}
 							</p>
-							<span className={styles.icon}>
-								<ArrowDown2 size={16} />
-							</span>
+							{!!props?.value && props?.onClean ? (
+								<div
+									className={styles.icon_clean}
+									onClick={(e) => {
+										if (props?.onClean) {
+											e.stopPropagation();
+											props.onClean();
+										}
+									}}
+								>
+									<CloseCircle size='16' variant='Bold' />
+								</div>
+							) : (
+								<span className={styles.icon}>
+									<ArrowDown2 size={16} />
+								</span>
+							)}
 						</div>
 					</div>
 				</TippyHeadless>

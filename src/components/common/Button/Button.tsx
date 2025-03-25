@@ -2,6 +2,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import styles from './Button.module.scss';
 import {useStyleClass} from '~/common/hooks/usStyleClass';
+import {JSX} from 'react';
 
 interface props {
 	onClick?: () => void;

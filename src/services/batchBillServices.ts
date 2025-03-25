@@ -19,13 +19,15 @@ const batchBillServices = {
 			timeEnd: string | null;
 			specificationsUuid: string;
 			warehouseUuid: string;
-			customerUuid: string[];
 			productTypeUuid: string;
 			qualityUuid: string;
 			transportType: number | null;
 			shipUuid?: string;
 			typeCheckDay: number | 0;
 			scalesStationUuid: string | null;
+			truckUuid: string[];
+			customerUuid: string;
+			listCustomerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -148,13 +150,15 @@ const batchBillServices = {
 			typeFindDay: number;
 			timeStart: string;
 			timeEnd: string;
-			isShowBDMT: number;
+			isShowBDMT: number | null;
 			storageUuid: string;
 			customerUuid: string[];
 			warehouseUuid: string;
 			userOwnerUuid: string;
 			provinceId: string;
 			transportType: number | null;
+			listCompanyUuid: string[];
+			listPartnerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -205,6 +209,30 @@ const batchBillServices = {
 		tokenAxios?: any
 	) => {
 		return axiosClient.post(`/BatchBill/view-action-audit`, data, {
+			cancelToken: tokenAxios,
+		});
+	},
+	dashbroadCustomerBillIn: (
+		data: {
+			userOwnerUuid: string;
+			partnerUuid: string;
+			companyUuid: string;
+			typeFindDay: number;
+			timeStart: string | null;
+			timeEnd: string | null;
+			isShowBDMT: number;
+			typeShow: number;
+			transportType: number;
+			storageUuid: string;
+			provinceId: string;
+			customerUuid: string[];
+			warehouseUuid: string;
+			listCompanyUuid: string[];
+			listPartnerUuid: string[];
+		},
+		tokenAxios?: any
+	) => {
+		return axiosClient.post(`/BatchBill/dashbroad-customer-bill-in`, data, {
 			cancelToken: tokenAxios,
 		});
 	},

@@ -56,6 +56,9 @@ export enum PATH {
 
 	// Kho hàng
 	KhoHang = '/kho-hang',
+
+	// Thống kê theo ngày
+	ThongKeTheoNgay = '/thong-ke-theo-ngay',
 }
 
 export const Menu: {
@@ -153,6 +156,17 @@ export const Menu: {
 				title: 'Giá tiền hàng tương lai',
 				icon: icons.giatienhangtuonglai,
 				path: PATH.GiaTienHangTuongLai,
+				regencys: [
+					REGENCY_CODE.GIAM_DOC,
+					REGENCY_CODE.PHO_GIAM_DOC,
+					REGENCY_CODE.QUAN_LY_NHAP_HANG,
+					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
+				],
+			},
+			{
+				title: 'Thống kê theo ngày',
+				icon: icons.thongkethoethang,
+				path: PATH.ThongKeTheoNgay,
 				regencys: [
 					REGENCY_CODE.GIAM_DOC,
 					REGENCY_CODE.PHO_GIAM_DOC,

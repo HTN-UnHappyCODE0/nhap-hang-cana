@@ -46,7 +46,7 @@ function FormCreateStorage({draggedElements, onClose}: PropsFormCreateStorage) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					status: CONFIG_STATUS.HOAT_DONG,
-					type: [TYPE_PRODUCT.CONG_TY],
+					type: [TYPE_PRODUCT.CONG_TY, TYPE_PRODUCT.DUNG_CHUNG],
 				}),
 			}),
 		select(data) {

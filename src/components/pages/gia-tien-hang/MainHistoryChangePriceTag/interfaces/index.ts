@@ -10,6 +10,12 @@ export interface IPriceTagChangeHistory {
 				type: number;
 				uuid: string;
 			};
+			companyUu: {
+				code: string;
+				name: string;
+				status: number;
+				uuid: string;
+			};
 			code: string;
 			name: string;
 			status: number;

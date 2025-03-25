@@ -1,4 +1,4 @@
-export interface PropsSelectFilterOption {
+export interface PropsSelectFilterState {
 	isShowAll?: boolean;
 	placeholder: string;
 	uuid: string;

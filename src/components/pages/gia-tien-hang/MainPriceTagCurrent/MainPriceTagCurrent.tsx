@@ -13,7 +13,6 @@ import {
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
-	REGENCY_CODE,
 	REGENCY_NAME,
 	TYPE_PRODUCT,
 	TYPE_TRANSPORT,
@@ -40,15 +39,19 @@ import {FaHistory} from 'react-icons/fa';
 import TagStatusSpecCustomer from './TagStatusSpecCustomer';
 import userServices from '~/services/userServices';
 import regencyServices from '~/services/regencyServices';
-import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import companyServices from '~/services/companyServices';
 
 function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 	const router = useRouter();
 
-	const {_page, _pageSize, _keyword, _specUuid, _productTypeUuid, _state, _parentUserUuid, _userUuid, _transportType, _status} =
-		router.query;
+	const {_page, _pageSize, _keyword, _state, _parentUserUuid, _userUuid, _transportType, _status} = router.query;
 
 	const [dataUpdate, setDataUpdate] = useState<IPriceTag | null>(null);
+	const [uuidCompany, setUuidCompany] = useState<string>('');
+	const [uuidSpec, setUuidSpec] = useState<string>('');
+	const [uuidProduct, setUuidProduct] = useState<string>('');
+	const [uuidQuality, setUuidQuality] = useState<string>('');
 
 	const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
 		queryFn: () =>
@@ -69,12 +72,71 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 			return data;
 		},
 	});
+	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: companyServices.listCompany({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listSpecifications = useQuery([QUERY_KEY.dropdown_quy_cach, uuidProduct, uuidQuality], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listSpecification({
+					page: 1,
+					pageSize: 100,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+					qualityUuid: uuidQuality,
+					productTypeUuid: uuidProduct,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+		// enabled: !!uuidProduct && !!uuidQuality,
+	});
 
 	const listRegency = useQuery([QUERY_KEY.dropdown_chuc_vu], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
 				http: regencyServices.listRegency({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listQuality({
 					page: 1,
 					pageSize: 50,
 					keyword: '',
@@ -140,13 +202,15 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 			_page,
 			_pageSize,
 			_keyword,
-			_specUuid,
 			_parentUserUuid,
 			_userUuid,
-			_productTypeUuid,
 			_state,
 			_transportType,
 			_status,
+			uuidCompany,
+			uuidProduct,
+			uuidQuality,
+			uuidSpec,
 		],
 		{
 			queryFn: () =>
@@ -162,13 +226,15 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 						// status: !!_status ? Number(_status) : null,
 						status: CONFIG_STATUS.HOAT_DONG,
 						customerUuid: '',
-						specUuid: (_specUuid as string) || '',
-						productTypeUuid: (_productTypeUuid as string) || '',
+						specUuid: uuidSpec,
+						productTypeUuid: uuidProduct,
 						priceTagUuid: '',
 						state: !!_state ? Number(_state) : null,
 						transportType: !!_transportType ? Number(_transportType) : null,
 						userUuid: (_userUuid as string) || '',
 						parentUserUuid: (_parentUserUuid as string) || '',
+						companyUuid: uuidCompany,
+						qualityUuid: uuidQuality,
 					}),
 				}),
 			select(data) {
@@ -193,6 +259,12 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 		}
 	}, [_parentUserUuid]);
 
+	useEffect(() => {
+		if (uuidProduct || uuidQuality) {
+			setUuidSpec('');
+		}
+	}, [uuidProduct, uuidQuality]);
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
@@ -200,7 +272,19 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 					<div className={styles.search}>
 						<Search keyName='_keyword' placeholder='Tìm kiếm theo nhà cung cấp, công ty' />
 					</div>
+
 					<div className={styles.filter}>
+						<SelectFilterState
+							uuid={uuidCompany}
+							setUuid={setUuidCompany}
+							listData={listCompany?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.name,
+							}))}
+							placeholder='Kv cảng xuất khẩu'
+						/>
+					</div>
+					{/* <div className={styles.filter}>
 						<FilterCustom
 							isSearch
 							name='Loại hàng'
@@ -210,47 +294,18 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 								name: v?.name,
 							}))}
 						/>
-					</div>
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<>
-							<div className={styles.filter}>
-								<FilterCustom
-									isSearch
-									name='Quản lý nhập hàng'
-									query='_parentUserUuid'
-									listFilter={listUserPurchasing?.data?.map((v: any) => ({
-										id: v?.uuid,
-										name: v?.fullName,
-									}))}
-								/>
-							</div>
-							<div className={styles.filter}>
-								<FilterCustom
-									isSearch
-									name='Nhân viên thị trường'
-									query='_userUuid'
-									listFilter={listUserMarket?.data?.map((v: any) => ({
-										id: v?.uuid,
-										name: v?.fullName,
-									}))}
-								/>
-							</div>
-						</>
-					</CheckRegencyCode>
-					{/* <div className={styles.filter}>
-						<FilterCustom
-							isSearch
-							name='Quy cách'
-							query='_specUuid'
-							listFilter={listSpecifications?.data?.map((v: any) => ({
-								id: v?.uuid,
+					</div> */}
+					<div className={styles.filter}>
+						<SelectFilterState
+							uuid={uuidProduct}
+							setUuid={setUuidProduct}
+							listData={listProductType?.data?.map((v: any) => ({
+								uuid: v?.uuid,
 								name: v?.name,
 							}))}
+							placeholder='Loại hàng'
 						/>
-					</div> */}
+					</div>
 					<div className={styles.filter}>
 						<FilterCustom
 							isSearch
@@ -269,6 +324,65 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 						/>
 					</div>
 					<div className={styles.filter}>
+						<SelectFilterState
+							uuid={uuidQuality}
+							setUuid={setUuidQuality}
+							listData={listQuality?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.name,
+							}))}
+							placeholder='Quốc gia'
+						/>
+					</div>
+
+					<div className={styles.filter}>
+						<SelectFilterState
+							uuid={uuidSpec}
+							setUuid={setUuidSpec}
+							listData={listSpecifications?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.name,
+							}))}
+							placeholder='Quy cách'
+						/>
+					</div>
+
+					<div className={styles.filter}>
+						<FilterCustom
+							isSearch
+							name='Quản lý nhập hàng'
+							query='_parentUserUuid'
+							listFilter={listUserPurchasing?.data?.map((v: any) => ({
+								id: v?.uuid,
+								name: v?.fullName,
+							}))}
+						/>
+					</div>
+					<div className={styles.filter}>
+						<FilterCustom
+							isSearch
+							name='Nhân viên thị trường'
+							query='_userUuid'
+							listFilter={listUserMarket?.data?.map((v: any) => ({
+								id: v?.uuid,
+								name: v?.fullName,
+							}))}
+						/>
+					</div>
+
+					{/* <div className={styles.filter}>
+						<FilterCustom
+							isSearch
+							name='Quy cách'
+							query='_specUuid'
+							listFilter={listSpecifications?.data?.map((v: any) => ({
+								id: v?.uuid,
+								name: v?.name,
+							}))}
+						/>
+					</div> */}
+
+					{/* <div className={styles.filter}>
 						<FilterCustom
 							isSearch
 							name='Cung cấp'
@@ -284,7 +398,7 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 								},
 							]}
 						/>
-					</div>
+					</div> */}
 				</div>
 				<div>
 					<Button p_8_16 rounded_2 href={PATH.ThemGiaTien} icon={<Image alt='icon add' src={icons.add} width={20} height={20} />}>
@@ -322,6 +436,10 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 								),
 							},
 							{
+								title: 'Kv cảng xuất khẩu',
+								render: (data: IPriceTag) => <>{data?.customerUu?.companyUu?.name || '---'}</>,
+							},
+							{
 								title: 'Giá tiền (VNĐ)',
 								render: (data: IPriceTag) => <>{convertCoin(data?.pricetagUu?.amount) || 0} </>,
 							},
@@ -337,10 +455,6 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 								title: 'Loại hàng',
 								render: (data: IPriceTag) => <>{data?.productTypeUu?.name || '---'}</>,
 							},
-							// {
-							// 	title: 'Quy cách',
-							// 	render: (data: IPriceTag) => <>{data?.specUu?.name || '---'}</>,
-							// },
 							{
 								title: 'Vận chuyển',
 								render: (data: IPriceTag) => (
@@ -350,6 +464,15 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 									</>
 								),
 							},
+							{
+								title: 'Quốc gia',
+								render: (data: IPriceTag) => <>{data?.qualityUu?.name || '---'}</>,
+							},
+							{
+								title: 'Quy cách',
+								render: (data: IPriceTag) => <>{data?.specUu?.name || '---'}</>,
+							},
+
 							{
 								title: 'Cung cấp',
 								render: (data: any) => <TagStatusSpecCustomer status={data.state} />,
@@ -361,6 +484,7 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 							},
 							{
 								title: 'Tác vụ',
+								selectRow: true,
 								fixedRight: true,
 								render: (data: IPriceTag) => (
 									<div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
@@ -386,7 +510,7 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 					currentPage={Number(_page) || 1}
 					total={listPriceTag?.data?.pagination?.totalCount}
 					pageSize={Number(_pageSize) || 200}
-					dependencies={[_pageSize, _keyword, _specUuid, _productTypeUuid, _transportType, _status]}
+					dependencies={[_pageSize, _keyword, _transportType, _status, uuidCompany, uuidProduct, uuidQuality, uuidSpec]}
 				/>
 			</div>
 

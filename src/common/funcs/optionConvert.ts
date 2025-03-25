@@ -61,9 +61,13 @@ export function removeVietnameseTones(str: string): string {
 
 export function getTextAddress(detailAddress: any, address?: string): string {
 	if (address) {
-		return `${address}, ${detailAddress?.town?.name}, ${detailAddress?.district?.name}, ${detailAddress?.province?.name}`;
+		return `${address || '---'}, ${detailAddress?.town?.name || '---'}, ${detailAddress?.district?.name || '---'}, ${
+			detailAddress?.province?.name || '---'
+		}`;
 	} else {
-		return `${detailAddress?.town?.name}, ${detailAddress?.district?.name}, ${detailAddress?.province?.name}`;
+		return `${detailAddress?.town?.name || '---'}, ${detailAddress?.district?.name || '---'}, ${
+			detailAddress?.province?.name || '---'
+		}`;
 	}
 }
 

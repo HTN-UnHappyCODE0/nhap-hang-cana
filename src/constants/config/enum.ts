@@ -44,6 +44,7 @@ export enum QUERY_KEY {
 	table_khach_hang_bai,
 	table_lich_su_bai,
 	table_bai,
+	table_thong_ke_theo_ngay,
 
 	chi_tiet_quy_cach,
 	chi_tiet_gia_tien_chinh_sua,

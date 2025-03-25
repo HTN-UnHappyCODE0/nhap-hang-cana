@@ -7,6 +7,7 @@ interface IUser {
 	avatar: string | null;
 	fullname: string | null;
 	regencyCode: number | null;
+	companyUuid: string | null;
 }
 
 export interface UserState {

@@ -1,4 +1,4 @@
-import React, {useRef, useState, useMemo, useCallback} from 'react';
+import React, {useRef, useState, useMemo, useCallback, useEffect} from 'react';
 import TippyHeadless from '@tippyjs/react/headless';
 import clsx from 'clsx';
 import {BiCheck} from 'react-icons/bi';
@@ -12,7 +12,7 @@ import Button from '~/components/common/Button';
 function SelectFilterMany({selectedIds, setSelectedIds, listData, placeholder, isShowAll = true}: PropsSelectFilterMany) {
 	const [keyword, setKeyword] = useState<string>('');
 	const [openDropdown, setOpenDropdown] = useState<boolean>(false);
-	const [tempSelectedIds, setTempSelectedIds] = useState<string[]>(selectedIds); // Danh sách tạm thời
+	const [tempSelectedIds, setTempSelectedIds] = useState<string[]>(selectedIds);
 
 	const inputSearchRef = useRef<HTMLInputElement>(null);
 
@@ -28,18 +28,23 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, placeholder, i
 	const handleCloseDropdown = useCallback(() => {
 		setOpenDropdown(false);
 		setTempSelectedIds(selectedIds);
-	}, []);
+	}, [selectedIds]);
 
 	const handleConfirm = () => {
 		setSelectedIds(tempSelectedIds);
 		setOpenDropdown(false);
 	};
 
-	// Hủy thay đổi
 	const handleCancel = () => {
 		setTempSelectedIds(selectedIds);
 		setOpenDropdown(false);
 	};
+
+	useEffect(() => {
+		if (openDropdown) {
+			setTempSelectedIds(selectedIds);
+		}
+	}, [openDropdown]);
 
 	return (
 		<TippyHeadless
@@ -94,9 +99,9 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, placeholder, i
 					{selectedIds.length === 0
 						? placeholder
 						: listData
-								.filter((v) => selectedIds.includes(v.uuid))
-								.map((v) => v.name)
-								.join(', ')}
+								?.filter((v) => selectedIds?.includes(v.uuid))
+								?.map((v) => v.name)
+								?.join(', ')}
 				</p>
 				<div className={styles.arrow}>
 					<ArrowDown2 size={16} />

@@ -4,7 +4,7 @@ import {PropsTable} from './interfaces';
 import clsx from 'clsx';
 import styles from './Table.module.scss';
 
-function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
+function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}: PropsTable) {
 	const myElementRef = useRef<any>(null);
 	const [isShowScroll, setIsShowScroll] = useState<boolean>(false);
 
@@ -18,10 +18,8 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 	};
 
 	useEffect(() => {
-		// Check scroll on component mount
 		checkForHorizontalScroll();
 
-		// Set up resize event listener
 		window.addEventListener('resize', checkForHorizontalScroll);
 
 		return () => {
@@ -29,7 +27,6 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 		};
 	}, []);
 
-	/*---------- Handle CheckBox ----------*/
 	useEffect(() => {
 		onSetData &&
 			onSetData((prev: any[]) =>
@@ -39,12 +36,14 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 					index: index,
 				}))
 			);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleCheckAll = (e: any) => {
 		const {checked} = e.target;
-		onSetData && onSetData((prev: any[]) => prev.map((item: any) => ({...item, isChecked: checked})));
+		onSetData &&
+			onSetData((prev: any[]) =>
+				prev?.map((item: any) => (isDisableCheckBox && isDisableCheckBox(item) ? item : {...item, isChecked: checked}))
+			);
 	};
 
 	const handleCheckRow = (e: any, i: any) => {
@@ -61,8 +60,12 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 	};
 
 	const isCheckedAll = useMemo(() => {
-		return data.length > 0 ? data.some((item: any) => item?.isChecked === false) : false;
-	}, [data]);
+		return data.length > 0
+			? data.some((item: any) =>
+					isDisableCheckBox ? !isDisableCheckBox(item) && item?.isChecked === false : item?.isChecked === false
+			  )
+			: false;
+	}, [data, isDisableCheckBox]);
 
 	const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
@@ -108,7 +111,7 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 				</thead>
 				<tbody>
 					{data.map((row: any, rowIndex: number) => (
-						<tr key={rowIndex}>
+						<tr key={rowIndex} className={styles.tr_data}>
 							{column.map((col: any, colIndex: number) => {
 								const isTitle = typeof col.isTitle === 'function' ? col.isTitle(row, rowIndex) : col.isTitle;
 
@@ -137,6 +140,7 @@ function Table({data, column, onSetData, fixedHeader = false}: PropsTable) {
 													onChange={(e) => handleCheckRow(e, rowIndex)}
 													checked={row?.isChecked || false}
 													type='checkbox'
+													disabled={isDisableCheckBox ? isDisableCheckBox(row) : false}
 												/>
 											) : null}
 											{col.render(row, rowIndex)}

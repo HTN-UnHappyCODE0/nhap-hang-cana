@@ -1,10 +1,13 @@
 export interface PropsDashboardWarehouse {
 	isTotal?: boolean;
+	setUuidCompany?: (uuid: string) => void;
+	setUuidTypeProduct?: (uuid: number) => void;
 	total?: {
 		amountMT: number;
 		amountBDMTDemo: number;
 		amountBDMT: number;
 		amountTotalBDMT: number;
+		amountOutBDMT: number;
 	};
 	specTotal?: {
 		specUu: {
@@ -54,6 +57,7 @@ export interface PropsDashboardWarehouse {
 		amountBDMTDemo: number;
 		amountBDMT: number;
 		amountTotalBDMT: number;
+		amountOutBDMT: number;
 		code: string;
 		name: string;
 		status: number;

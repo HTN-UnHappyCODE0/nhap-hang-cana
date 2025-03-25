@@ -1,5 +1,6 @@
 .container {
 	padding-bottom: 4px;
+	padding-top: 4px;
 	overflow: auto;
 
 	&.fixedHeader {
@@ -42,7 +43,7 @@
 	th,
 	td {
 		padding: 12px;
-		line-height: 16px;
+		// line-height: 18px;
 		white-space: nowrap;
 	}
 
@@ -109,8 +110,9 @@
 	tbody {
 		.fixedLeft,
 		.fixedRight {
-			background: #fff;
+			background: inherit;
 		}
+		// background-color: #fff;
 
 		.selectedRow {
 			background-color: #e2f1fb;
@@ -131,6 +133,14 @@
 		margin-right: 8px;
 		width: 18px;
 		height: 18px;
+	}
+
+	.tr_data:nth-child(even) {
+		background-color: #f4f5f6;
+	}
+
+	.tr_data:nth-child(odd) {
+		background-color: #fff;
 	}
 }
 

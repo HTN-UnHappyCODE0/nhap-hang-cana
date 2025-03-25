@@ -5,7 +5,7 @@ const commonServices = {
 	listProvince: (
 		data: {
 			keyword: string;
-			status: CONFIG_STATUS;
+			status: CONFIG_STATUS | null;
 		},
 		tokenAxios?: any
 	) => {
@@ -16,7 +16,7 @@ const commonServices = {
 	listDistrict: (
 		data: {
 			keyword: string;
-			status: CONFIG_STATUS;
+			status: CONFIG_STATUS | null;
 			idParent: string;
 		},
 		tokenAxios?: any
@@ -28,7 +28,7 @@ const commonServices = {
 	listTown: (
 		data: {
 			keyword: string;
-			status: CONFIG_STATUS;
+			status: CONFIG_STATUS | null;
 			idParent: string;
 		},
 		tokenAxios?: any

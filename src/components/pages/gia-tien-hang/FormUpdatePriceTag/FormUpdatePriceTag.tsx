@@ -26,6 +26,7 @@ import {PiSealWarningFill} from 'react-icons/pi';
 import Moment from 'react-moment';
 import moment from 'moment';
 import {timeSubmit} from '~/common/funcs/optionConvert';
+import wareServices from '~/services/wareServices';
 
 function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 	const queryClient = useQueryClient();
@@ -36,10 +37,52 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 		customer: '',
 		productType: '',
 		spec: '',
+		quality: '',
 		transport: '',
 		state: CONFIG_STATE_SPEC_CUSTOMER.DANG_CUNG_CAP,
 		timeStart: null,
 		timeEnd: null,
+	});
+
+	const listSpecifications = useQuery([QUERY_KEY.dropdown_quy_cach, form.productTypeUuid], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listSpecification({
+					page: 1,
+					pageSize: 100,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+					qualityUuid: '',
+					productTypeUuid: form.productTypeUuid,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+		enabled: !!form.productTypeUuid,
+	});
+
+	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listQuality({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
 	});
 
 	const listPriceTag = useQuery([QUERY_KEY.dropdown_gia_tien_hang], {
@@ -85,7 +128,8 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 			setForm({
 				customer: dataUpdate?.customerUu?.name,
 				productType: dataUpdate?.productTypeUu?.name,
-				spec: dataUpdate?.specUu?.name,
+				spec: dataUpdate?.specUu?.name || '',
+				quality: dataUpdate?.qualityUu?.name || '',
 				transport:
 					dataUpdate?.transportType == TYPE_TRANSPORT.DUONG_BO
 						? 'Đường bộ'
@@ -134,20 +178,27 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 			return toastWarn({msg: 'Không tìm thấy giá thay đổi!'});
 		}
 
-		if (!!form.timeStart) {
-			const timeStart = new Date(form.timeStart);
-			if (timeStart < new Date()) {
-				return toastWarn({msg: 'Ngày bắt đầu phải lớn hơn ngày hiện tại!'});
-			}
+		// if (!!form.timeStart) {
+		// 	const timeStart = new Date(form.timeStart);
+		// 	if (timeStart < new Date()) {
+		// 		return toastWarn({msg: 'Ngày bắt đầu phải lớn hơn ngày hiện tại!'});
+		// 	}
+		// }
+
+		if (!form.timeStart) {
+			return toastWarn({msg: 'Vui lòng chọn ngày bắt đầu!'});
 		}
+		// if (!form.timeEnd) {
+		// 	return toastWarn({msg: 'Vui lòng chọn ngày kết thúc!'});
+		// }
 
 		if (!!form.timeEnd) {
 			const timeStart = new Date(form.timeStart);
 			const timeEnd = new Date(form.timeEnd);
 
-			if (timeEnd < new Date()) {
-				return toastWarn({msg: 'Ngày kết thúc phải lớn hơn ngày hiện tại!'});
-			}
+			// if (timeEnd < new Date()) {
+			// 	return toastWarn({msg: 'Ngày kết thúc phải lớn hơn ngày hiện tại!'});
+			// }
 
 			if (timeStart > timeEnd) {
 				return toastWarn({msg: 'Ngày kết thúc không nhỏ hơn ngày bắt đầu!'});
@@ -177,16 +228,6 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 							/>
 						</div>
 						<div className={clsx('mt', 'col_2')}>
-							{/* <Input
-								placeholder='Quy cách'
-								name='spec'
-								readOnly={true}
-								label={
-									<span>
-										Quy cách <span style={{color: 'red'}}>*</span>
-									</span>
-								}
-							/> */}
 							<div>
 								<Input
 									placeholder='Loại hàng'
@@ -212,11 +253,39 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 								/>
 							</div>
 						</div>
+						<div className={clsx('mt', 'col_2')}>
+							<Input
+								placeholder='Chưa có quy cách'
+								name='spec'
+								readOnly={true}
+								label={
+									<span>
+										Quy cách <span style={{color: 'red'}}>*</span>
+									</span>
+								}
+							/>
+							<div>
+								<Input
+									placeholder='Chưa có quốc gia'
+									name='quality'
+									readOnly={true}
+									label={
+										<span>
+											Quốc gia <span style={{color: 'red'}}>*</span>
+										</span>
+									}
+								/>
+							</div>
+						</div>
 
 						<div className={clsx('mt', 'col_2')}>
 							<DatePicker
 								icon={true}
-								label={<span>Từ ngày</span>}
+								label={
+									<span>
+										Từ ngày<span style={{color: 'red'}}>*</span>
+									</span>
+								}
 								placeholder='Chọn ngày'
 								value={form?.timeStart}
 								onSetValue={(date) =>
@@ -302,7 +371,7 @@ function FormUpdatePriceTag({dataUpdate, onClose}: PropsFormUpdatePriceTag) {
 												<PiSealWarningFill size={20} color='#2D74FF' className={styles.icon_warn} />
 												<div className={styles.note}>
 													<p>
-														giá tiền pháp dụng sau ngày{' '}
+														giá tiền pháp dụng sau ngày
 														<>
 															{form?.timeEnd ? (
 																<Moment date={form?.timeEnd} format='DD/MM/YYYY' />

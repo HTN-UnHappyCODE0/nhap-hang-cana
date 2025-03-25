@@ -306,15 +306,15 @@ function PageDetailWorkshop({}: PropsPageDetailWorkshop) {
 								{
 									title: 'Loại hàng',
 									fixedLeft: true,
-									render: (data: IlistCustomerSpec) => <>{data?.productTypeUu?.name}</>,
+									render: (data: IlistCustomerSpec) => <>{data?.productTypeUu?.name || '---'}</>,
 								},
 								{
 									title: 'Quốc gia',
-									render: (data: IlistCustomerSpec) => <>{data?.qualityUu?.name}</>,
+									render: (data: IlistCustomerSpec) => <>{data?.qualityUu?.name || '---'}</>,
 								},
 								{
 									title: 'Quy cách',
-									render: (data: IlistCustomerSpec) => <>{data?.specUu?.name}</>,
+									render: (data: IlistCustomerSpec) => <>{data?.specUu?.name || '---'}</>,
 								},
 								{
 									title: 'Bãi',

@@ -291,7 +291,8 @@ function DetailWarehouse({}: PropsDetailWarehouse) {
 			</div>
 
 			<Dialog
-				danger
+				danger={detailWarehouse?.status == CONFIG_STATUS.HOAT_DONG}
+				green={detailWarehouse?.status == CONFIG_STATUS.BI_KHOA}
 				open={openChangeStatus}
 				onClose={() => setOpenChangeStatus(false)}
 				title={detailWarehouse?.status == CONFIG_STATUS.HOAT_DONG ? 'Khóa kho hàng' : 'Mở khóa kho hàng'}

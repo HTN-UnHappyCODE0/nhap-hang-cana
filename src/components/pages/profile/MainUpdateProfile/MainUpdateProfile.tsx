@@ -92,7 +92,7 @@ function MainUpdateProfile({}: PropsMainUpdateProfile) {
 				isDropdown: true,
 				http: commonServices.listProvince({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 				}),
 			}),
 		select(data) {
@@ -106,7 +106,7 @@ function MainUpdateProfile({}: PropsMainUpdateProfile) {
 				isDropdown: true,
 				http: commonServices.listDistrict({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 					idParent: form?.provinceId,
 				}),
 			}),
@@ -122,7 +122,7 @@ function MainUpdateProfile({}: PropsMainUpdateProfile) {
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
+					status: null,
 					idParent: form.districtId,
 				}),
 			}),
@@ -218,6 +218,7 @@ function MainUpdateProfile({}: PropsMainUpdateProfile) {
 						uuid: infoUser?.uuid || '',
 						userName: infoUser?.userName || '',
 						fullname: form.fullName || '',
+						companyUuid: infoUser?.companyUuid || '',
 					})
 				);
 				router.replace(PATH.Profile, undefined, {

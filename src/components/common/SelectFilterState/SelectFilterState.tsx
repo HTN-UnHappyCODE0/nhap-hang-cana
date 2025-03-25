@@ -1,15 +1,15 @@
 import React, {useRef, useState} from 'react';
 import TippyHeadless from '@tippyjs/react/headless';
 
-import {PropsSelectFilterOption} from './interfaces';
-import styles from './SelectFilterOption.module.scss';
+import {PropsSelectFilterState} from './interfaces';
+import styles from './SelectFilterState.module.scss';
 import clsx from 'clsx';
 import {BiCheck} from 'react-icons/bi';
 import {removeVietnameseTones} from '~/common/funcs/optionConvert';
 import {ArrowDown2} from 'iconsax-react';
 import {set} from 'nprogress';
 
-function SelectFilterOption({uuid, setUuid, listData, placeholder, isShowAll = true, setName}: PropsSelectFilterOption) {
+function SelectFilterState({uuid, setUuid, listData, placeholder, isShowAll = true, setName}: PropsSelectFilterState) {
 	const [keyword, setKeyword] = useState<string>('');
 	const [openPartner, setOpenPartner] = useState<boolean>(false);
 	const inputSearchRef = useRef<HTMLInputElement>(null);
@@ -91,7 +91,11 @@ function SelectFilterOption({uuid, setUuid, listData, placeholder, isShowAll = t
 					handleSelectClick();
 				}}
 			>
-				<p>{uuid == '' ? placeholder : listData?.find((v: any) => v?.uuid == uuid)?.name}</p>
+				<div className={styles.value}>
+					<p className={styles.name}>{placeholder && `${placeholder}:`}</p>
+					<p className={styles.text}>{uuid == '' ? 'Tất cả' : listData?.find((v: any) => v?.uuid == uuid)?.name}</p>
+				</div>
+
 				<div className={styles.arrow}>
 					<ArrowDown2 size={16} />
 				</div>
@@ -100,4 +104,4 @@ function SelectFilterOption({uuid, setUuid, listData, placeholder, isShowAll = t
 	);
 }
 
-export default SelectFilterOption;
+export default SelectFilterState;

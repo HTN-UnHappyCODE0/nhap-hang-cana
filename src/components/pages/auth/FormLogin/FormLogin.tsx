@@ -68,6 +68,7 @@ function FormLogin({}: PropsFormLogin) {
 						fullname: data.fullname,
 						regencyCode: data.regencyCode,
 						userUuid: data.userUuid,
+						companyUuid: data.companyUuid,
 					})
 				);
 				store.dispatch(setStateLogin(true));

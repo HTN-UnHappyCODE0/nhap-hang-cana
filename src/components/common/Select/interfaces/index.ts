@@ -9,6 +9,7 @@ export interface PropsSelector {
 	valuename?: string;
 	label?: string | React.ReactNode;
 	isSearch?: boolean;
+	onClean?: () => void;
 }
 
 export interface PropsOption {

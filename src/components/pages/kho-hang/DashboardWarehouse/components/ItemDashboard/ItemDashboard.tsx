@@ -7,11 +7,13 @@ import {ChartSquare} from 'iconsax-react';
 import clsx from 'clsx';
 import {convertWeight} from '~/common/funcs/optionConvert';
 
-function ItemDashboard({isTotal, value, text, background}: PropsItemDashboard) {
+function ItemDashboard({isTotal, value, text, background, textColor}: PropsItemDashboard) {
 	return (
 		<div className={clsx(styles.container, {[styles.isTotal]: isTotal})}>
 			<div>
-				<h5 className={styles.value}>{convertWeight(value)}</h5>
+				<h5 className={styles.value} style={{color: textColor}}>
+					{convertWeight(value)}
+				</h5>
 				<p className={styles.text}>{text}</p>
 			</div>
 			<div style={{background: background}} className={styles.box}>

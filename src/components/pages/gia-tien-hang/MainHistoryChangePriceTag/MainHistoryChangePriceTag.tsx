@@ -13,7 +13,6 @@ import {
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
-	REGENCY_CODE,
 	REGENCY_NAME,
 	TYPE_PRICE_FUTURE,
 	TYPE_PRODUCT,
@@ -32,13 +31,15 @@ import Link from 'next/link';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import TagStatusSpecCustomer from '../MainPriceTagCurrent/TagStatusSpecCustomer';
 import DatePickerFilter from '~/components/common/DatePickerFilter';
-import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import companyServices from '~/services/companyServices';
 
 function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 	const {_page, _pageSize, _keyword, _userOwnerCompanyUuid, _parentUserUuid, _productTypeUuid, _userOwnerUuid, _transportType, _status} =
 		router.query;
 
 	const [dateCheck, setDateCheck] = useState<Date | null>(null);
+	const [uuidCompany, setUuidCompany] = useState<string>('');
 
 	const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
 		queryFn: () =>
@@ -73,6 +74,25 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					status: CONFIG_STATUS.HOAT_DONG,
 					qualityUuid: '',
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: companyServices.listCompany({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
 				}),
 			}),
 		select(data) {
@@ -155,6 +175,7 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 			_transportType,
 			_status,
 			dateCheck,
+			uuidCompany,
 		],
 		{
 			queryFn: () =>
@@ -174,6 +195,7 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 						userOwnerCompanyUuid: (_userOwnerCompanyUuid as string) || '',
 						userOwnerUuid: (_userOwnerUuid as string) || '',
 						dateCheck: dateCheck ? moment(dateCheck).format('YYYY-MM-DD') : null,
+						companyUuid: uuidCompany,
 					}),
 				}),
 			select(data) {
@@ -187,6 +209,18 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 				<div className={styles.main_search}>
 					<div className={styles.search}>
 						<Search keyName='_keyword' placeholder='Tìm kiếm theo nhà cung cấp' />
+					</div>
+
+					<div className={styles.filter}>
+						<SelectFilterState
+							uuid={uuidCompany}
+							setUuid={setUuidCompany}
+							listData={listCompany?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.name,
+							}))}
+							placeholder='Kv cảng xuất khẩu'
+						/>
 					</div>
 
 					<div className={styles.filter}>
@@ -219,7 +253,7 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 						/>
 					</div>
 
-					{/* <div className={styles.filter}>
+					<div className={styles.filter}>
 						<FilterCustom
 							isSearch
 							name='Trạng thái'
@@ -243,37 +277,31 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 								},
 							]}
 						/>
-					</div> */}
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<>
-							<div className={styles.filter}>
-								<FilterCustom
-									isSearch
-									name='Quản lý nhập hàng'
-									query='_userOwnerCompanyUuid'
-									listFilter={listUserPurchasing?.data?.map((v: any) => ({
-										id: v?.uuid,
-										name: v?.fullName,
-									}))}
-								/>
-							</div>
+					</div>
 
-							<div className={styles.filter}>
-								<FilterCustom
-									isSearch
-									name='Nhân viên thị trường'
-									query='_userOwnerUuid'
-									listFilter={listUserMarket?.data?.map((v: any) => ({
-										id: v?.uuid,
-										name: v?.fullName,
-									}))}
-								/>
-							</div>
-						</>
-					</CheckRegencyCode>
+					<div className={styles.filter}>
+						<FilterCustom
+							isSearch
+							name='Quản lý nhập hàng'
+							query='_userOwnerCompanyUuid'
+							listFilter={listUserPurchasing?.data?.map((v: any) => ({
+								id: v?.uuid,
+								name: v?.fullName,
+							}))}
+						/>
+					</div>
+
+					<div className={styles.filter}>
+						<FilterCustom
+							isSearch
+							name='Nhân viên thị trường'
+							query='_userOwnerUuid'
+							listFilter={listUserMarket?.data?.map((v: any) => ({
+								id: v?.uuid,
+								name: v?.fullName,
+							}))}
+						/>
+					</div>
 
 					<div className={styles.filter}>
 						{/* <DateRangerCustom titleTime='Thời gian' typeDateDefault={TYPE_DATE.TODAY} /> */}
@@ -321,6 +349,10 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 								),
 							},
 							{
+								title: 'Kv cảng xuất khẩu',
+								render: (data: IPriceTagChangeHistory) => <>{data?.customerSpecUu?.customerUu?.companyUu?.name || '---'}</>,
+							},
+							{
 								title: 'Giá tiền (VNĐ)',
 								render: (data: IPriceTagChangeHistory) => <>{convertCoin(data?.pricetagUu?.amount) || 0} </>,
 							},
@@ -357,6 +389,7 @@ function MainHistoryChangePriceTag({}: PropsMainHistoryChangePriceTag) {
 						_userOwnerUuid,
 						_transportType,
 						_status,
+						uuidCompany,
 					]}
 				/>
 			</div>

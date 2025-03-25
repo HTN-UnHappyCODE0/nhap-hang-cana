@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {PropsChartImportCompany} from './interfaces';
 import styles from './ChartImportCompany.module.scss';
@@ -35,6 +35,7 @@ import router from 'next/router';
 import companyServices from '~/services/companyServices';
 import commonServices from '~/services/commonServices';
 import SelectFilterMany from '../SelectFilterMany';
+import {convertCoin} from '~/common/funcs/convertCoin';
 
 function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isShowBDMT, setIsShowBDMT] = useState<string>(String(TYPE_SHOW_BDMT.MT));
@@ -45,24 +46,56 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 	const [userUuid, setUserUuid] = useState<string>('');
 	const [storageUuid, setStorageUuid] = useState<string>('');
 	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.LAST_7_DAYS);
-	const [uuidCompany, setUuidCompanyFilter] = useState<string>('');
+	const [uuidCompany, setUuidCompanyFilter] = useState<string[]>([]);
 	const [date, setDate] = useState<{
 		from: Date | null;
 		to: Date | null;
 	} | null>(null);
 
-	const [dataChart, setDataChart] = useState<any[]>([]);
+	const [dataChartMT, setDataChartMT] = useState<any[]>([]);
+	const [dataChartBDMT, setDataChartBDMT] = useState<any[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [dataTotal, setDataTotal] = useState<{
 		totalWeight: number;
+		totalWeightBDMT: number;
+		drynessAvg: number;
 		lstProductTotal: {
 			name: string;
 			colorShow: string;
 			weightMT: number;
+			weightBDMT: number;
+			drynessAvg: number;
 		}[];
 	}>({
+		totalWeightBDMT: 0,
+		drynessAvg: 0,
 		totalWeight: 0,
 		lstProductTotal: [],
+	});
+
+	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: customerServices.listCustomer({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					partnerUUid: '',
+					userUuid: '',
+					status: STATUS_CUSTOMER.HOP_TAC,
+					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
+					provinceId: '',
+					specUuid: '',
+					listCompanyUuid: uuidCompany,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
 	});
 
 	const listStorage = useQuery([QUERY_KEY.dropdown_bai], {
@@ -81,30 +114,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					qualityUuid: '',
 					specificationsUuid: '',
 					warehouseUuid: '',
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: customerServices.listCustomer({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.TABLE,
-					partnerUUid: '',
-					userUuid: '',
-					status: STATUS_CUSTOMER.HOP_TAC,
-					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
-					provinceId: '',
-					specUuid: '',
 				}),
 			}),
 		select(data) {
@@ -194,7 +203,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			QUERY_KEY.thong_ke_tong_hang_nhap,
 			customerUuid,
 			storageUuid,
-			isShowBDMT,
 			date,
 			userUuid,
 			uuidCompany,
@@ -209,21 +217,23 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					http: batchBillServices.dashbroadBillIn({
 						partnerUuid: '',
 						customerUuid: customerUuid,
-						isShowBDMT: Number(isShowBDMT),
+						isShowBDMT: 1,
 						storageUuid: storageUuid,
 						userOwnerUuid: userUuid,
 						warehouseUuid: '',
-						companyUuid: uuidCompany,
+						companyUuid: '',
 						typeFindDay: 0,
 						timeStart: timeSubmit(date?.from)!,
 						timeEnd: timeSubmit(date?.to, true)!,
 						provinceId: provinceUuid,
 						transportType: isTransport ? Number(isTransport) : null,
+						listCompanyUuid: uuidCompany,
+						listPartnerUuid: [],
 					}),
 				}),
 			onSuccess({data}) {
 				// Convert data chart
-				const dataConvert = data?.lstProductDay?.map((v: any) => {
+				const dataConvertMT = data?.lstProductDay?.map((v: any) => {
 					const date =
 						data?.typeShow == TYPE_DATE_SHOW.HOUR
 							? moment(v?.timeScale).format('HH:mm')
@@ -235,7 +245,29 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
 						acc[item.productTypeUu.name] = item.weightMT;
+						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg;
+						return acc;
+					}, {});
 
+					return {
+						name: date,
+						...obj,
+					};
+				});
+
+				const dataConvertBDMT = data?.lstProductDay?.map((v: any) => {
+					const date =
+						data?.typeShow == TYPE_DATE_SHOW.HOUR
+							? moment(v?.timeScale).format('HH:mm')
+							: data?.typeShow == TYPE_DATE_SHOW.DAY
+							? moment(v?.timeScale).format('DD/MM')
+							: data?.typeShow == TYPE_DATE_SHOW.MONTH
+							? moment(v?.timeScale).format('MM-YYYY')
+							: moment(v?.timeScale).format('YYYY');
+
+					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
+						acc[item.productTypeUu.name] = item.weightBDMT;
+						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg;
 						return acc;
 					}, {});
 
@@ -265,20 +297,31 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					fill: productColors[key],
 				}));
 
-				setDataChart(dataConvert);
+				setDataChartMT(dataConvertMT);
+				setDataChartBDMT(dataConvertBDMT);
 				setProductTypes(productTypes);
 
 				setDataTotal({
 					totalWeight: data?.totalWeight,
+					totalWeightBDMT: data?.totalWeightBDMT,
+					drynessAvg: data?.drynessAvg,
 					lstProductTotal: (isProductSpec === '2' ? data?.lstSpecTotal : data?.lstProductTotal)?.map((v: any) => ({
 						name: v?.productTypeUu?.name,
 						colorShow: v?.productTypeUu?.colorShow,
 						weightMT: v?.weightMT,
+						weightBDMT: v?.weightBDMT,
+						drynessAvg: v?.drynessAvg,
 					})),
 				});
 			},
 		}
 	);
+
+	useEffect(() => {
+		if (uuidCompany) {
+			setCustomerUuid([]);
+		}
+	}, [uuidCompany]);
 
 	return (
 		<div className={styles.container}>
@@ -302,9 +345,18 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						placeholder='Tấn hàng'
 					/>
 
-					<SelectFilterOption
+					{/* <SelectFilterOption
 						uuid={uuidCompany}
 						setUuid={setUuidCompanyFilter}
+						listData={listCompany?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Tất cả kv cảng xuất khẩu'
+					/> */}
+					<SelectFilterMany
+						selectedIds={uuidCompany}
+						setSelectedIds={setUuidCompanyFilter}
 						listData={listCompany?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
@@ -398,13 +450,24 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			</div>
 			<div className={styles.head_data}>
 				<p className={styles.data_total}>
-					Tổng khối lượng nhập hàng: <span>{convertWeight(dataTotal?.totalWeight)}</span>
+					Tổng khối lượng nhập hàng:{' '}
+					<span>
+						{isShowBDMT === String(TYPE_SHOW_BDMT.MT)
+							? convertWeight(dataTotal?.totalWeight)
+							: convertWeight(dataTotal?.totalWeightBDMT)}
+						<span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span>
+					</span>
 				</p>
+
 				{dataTotal?.lstProductTotal?.map((v, i) => (
 					<div key={i} className={styles.data_item}>
 						<div style={{background: v?.colorShow}} className={styles.box_color}></div>
 						<p className={styles.data_total}>
-							{v?.name}: <span style={{color: '#171832'}}>{convertWeight(v?.weightMT)}</span>
+							{v?.name}:{' '}
+							<span style={{color: '#171832'}}>
+								{isShowBDMT === String(TYPE_SHOW_BDMT.MT) ? convertWeight(v?.weightMT) : convertWeight(v?.weightBDMT)}
+								<span> ({v?.drynessAvg?.toFixed(2)}%)</span>
+							</span>
 						</p>
 					</div>
 				))}
@@ -414,7 +477,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					<BarChart
 						width={500}
 						height={300}
-						data={dataChart}
+						data={isShowBDMT === String(TYPE_SHOW_BDMT.MT) ? dataChartMT : dataChartBDMT}
 						margin={{
 							top: 8,
 							right: 8,
@@ -425,7 +488,13 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					>
 						<XAxis dataKey='name' scale='point' padding={{left: 40, right: 10}} />
 						<YAxis domain={[0, 4000000]} tickFormatter={(value): any => convertWeight(value)} />
-						<Tooltip formatter={(value): any => convertWeight(Number(value))} />
+						<Tooltip
+							formatter={(value, name, props): any => {
+								const dryness = props?.payload?.[`${name}_drynessAvg`] ?? 0;
+								return [`${convertWeight(Number(value))} (${dryness?.toFixed(2)}%)`, name];
+							}}
+						/>
+
 						<CartesianGrid strokeDasharray='3 3' vertical={false} />
 						{productTypes.map((v, i) => (
 							<Bar key={i} dataKey={v?.key} stackId='product_type' fill={v?.fill} />

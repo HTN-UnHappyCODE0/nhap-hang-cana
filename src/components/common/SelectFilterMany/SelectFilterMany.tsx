@@ -1,4 +1,4 @@
-import React, {useRef, useState, useMemo, useCallback} from 'react';
+import React, {useRef, useState, useMemo, useCallback, useEffect} from 'react';
 import TippyHeadless from '@tippyjs/react/headless';
 import clsx from 'clsx';
 import {BiCheck} from 'react-icons/bi';
@@ -18,7 +18,9 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, name, isShowAl
 
 	const filteredData = useMemo(() => {
 		const searchKey = removeVietnameseTones(keyword).toLowerCase();
-		return Array.isArray(listData) ? listData.filter((v) => removeVietnameseTones(v.name).toLowerCase().includes(searchKey)) : [];
+		return Array.isArray(listData)
+			? listData.filter((v) => v.name && removeVietnameseTones(v.name).toLowerCase().includes(searchKey))
+			: [];
 	}, [keyword, listData]);
 
 	const handleSelectItem = (uuid: string) => {
@@ -35,11 +37,16 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, name, isShowAl
 		setOpenDropdown(false);
 	};
 
-	// Hủy thay đổi
 	const handleCancel = () => {
 		setTempSelectedIds(selectedIds);
 		setOpenDropdown(false);
 	};
+
+	useEffect(() => {
+		if (openDropdown) {
+			setTempSelectedIds(selectedIds);
+		}
+	}, [openDropdown]);
 
 	return (
 		<TippyHeadless
@@ -50,6 +57,7 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, name, isShowAl
 			render={() => (
 				<div className={styles.main_option}>
 					<input
+						placeholder='Tìm kiếm...'
 						ref={inputSearchRef}
 						name='Tìm kiếm...'
 						className={styles.inputSearch}
@@ -94,11 +102,11 @@ function SelectFilterMany({selectedIds, setSelectedIds, listData, name, isShowAl
 					<p className={styles.name}>{name && `${name}:`}</p>
 					<p className={styles.selectedText}>
 						{selectedIds.length === 0
-							? name
+							? 'Tất cả'
 							: listData
-									.filter((v) => selectedIds.includes(v.uuid))
-									.map((v) => v.name)
-									.join(', ')}
+									?.filter((v) => selectedIds?.includes(v.uuid))
+									?.map((v) => v.name)
+									?.join(', ')}
 					</p>
 				</div>
 

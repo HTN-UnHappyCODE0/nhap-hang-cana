@@ -3,4 +3,5 @@ export interface PropsItemDashboard {
 	value: number;
 	text: string;
 	background: string;
+	textColor?: string;
 }

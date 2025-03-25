@@ -346,7 +346,8 @@ function DetailStorage({}: PropsDetailStorage) {
 			</div>
 
 			<Dialog
-				danger
+				danger={detailStorage?.status == CONFIG_STATUS.HOAT_DONG}
+				green={detailStorage?.status == CONFIG_STATUS.BI_KHOA}
 				open={openChangeStatus}
 				onClose={() => setOpenChangeStatus(false)}
 				title={detailStorage?.status == CONFIG_STATUS.HOAT_DONG ? 'Khóa kho hàng' : 'Mở khóa kho hàng'}

@@ -13,7 +13,6 @@ const weightSessionServices = {
 			isPaging: CONFIG_PAGING;
 			scalesType: number[];
 			billUuid: string;
-			truckUuid: string;
 			storageUuid: string;
 			isBatch: number | null;
 			timeStart: string | null;
@@ -21,10 +20,13 @@ const weightSessionServices = {
 			specUuid: string | null;
 			codeStart: number | null;
 			codeEnd: number | null;
-			customerUuid?: string | null;
 			productTypeUuid?: string | null;
 			shift?: number | null;
 			shipUuid?: string;
+			truckUuid: string;
+			listTruckUuid: string[];
+			customerUuid: string;
+			listCustomerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -78,7 +80,7 @@ const weightSessionServices = {
 			isPaging: CONFIG_PAGING;
 			scalesType: number[];
 			billUuid: string;
-			truckUuid: string;
+			truckUuid: string[];
 			storageUuid: string;
 			customerUuid: string;
 			productTypeUuid: string;
@@ -109,8 +111,8 @@ const weightSessionServices = {
 			scalesType: number[];
 			billUuid: string;
 			truckUuid: string;
+			listTruckUuid: string[];
 			storageUuid: string;
-			customerUuid: string;
 			productTypeUuid: string;
 			shipUuid: string;
 			isBatch: number | null;
@@ -120,6 +122,8 @@ const weightSessionServices = {
 			codeStart: number | null;
 			codeEnd: number | null;
 			shift: number | null;
+			customerUuid: string;
+			listCustomerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {

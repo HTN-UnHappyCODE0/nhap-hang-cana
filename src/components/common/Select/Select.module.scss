@@ -65,6 +65,19 @@ $font-size: 16px;
 		}
 	}
 
+	.icon_clean {
+		color: #6f767e;
+		transition: all 0.3s;
+
+		&:hover {
+			color: #29303c;
+		}
+
+		&:active {
+			transform: scale(0.9);
+		}
+	}
+
 	.icon {
 		display: flex;
 		justify-content: center;

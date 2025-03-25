@@ -20,6 +20,8 @@ const priceTagServices = {
 			state: number | null;
 			userUuid?: string | null;
 			parentUserUuid?: string | null;
+			companyUuid?: string;
+			qualityUuid?: string;
 		},
 		tokenAxios?: any
 	) => {
@@ -97,6 +99,7 @@ const priceTagServices = {
 				state: 0 | 1;
 				transportType: number;
 				storageUuid?: string;
+				qualityUuid?: string;
 			}[];
 			customerUuid: string[];
 		},
@@ -246,6 +249,7 @@ const priceTagServices = {
 			userOwnerCompanyUuid: string | null;
 			transportType: number | null;
 			dateCheck: string | null;
+			companyUuid?: string | null;
 		},
 		tokenAxios?: any
 	) => {
@@ -258,12 +262,14 @@ const priceTagServices = {
 			timeStart: string;
 			timeEnd: string;
 			userOwnerUuid: string;
-			partnerUuid: string;
-			customerUuid: string;
-			companyUuid: string;
-			transport_type: number | null;
 			productTypeUuid: string;
-			provinceId: string;
+			typeFindDay?: number;
+			transportType: number | null;
+			qualityUUid: string;
+			provinceId: string[];
+			customerUuid: string[];
+			listCompanyUuid: string[];
+			listPartnerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {

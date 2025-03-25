@@ -15,4 +15,5 @@ export interface PropsTable {
 	onSetData?: (any: any) => void;
 	isChild?: boolean;
 	fixedHeader?: boolean;
+	isDisableCheckBox?: (data: any) => boolean;
 }

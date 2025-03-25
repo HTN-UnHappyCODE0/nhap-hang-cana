@@ -132,7 +132,7 @@ function MainPageProfile({}: PropsMainPageProfile) {
 								<UserOctagon fontSize={24} fontWeight={600} />
 								Giới tính
 							</p>
-							<span>{detaillUser?.sex == GENDER.NAM ? 'Nam' : 'Nữ' || '---'}</span>
+							<span>{detaillUser?.sex === undefined ? '---' : detaillUser.sex == GENDER.NAM ? 'Nam' : 'Nữ'}</span>
 						</div>
 						<div className={styles.item_table}>
 							<p>
