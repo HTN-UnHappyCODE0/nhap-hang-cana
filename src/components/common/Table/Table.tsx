@@ -136,7 +136,9 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 										col.fixedRight && styles.fixedRight
 									)}
 									key={i}
-									ref={(el) => (thRefs.current[i] = el)}
+									ref={(el) => {
+										thRefs.current[i] = el;
+									}}
 									style={{
 										...(col.fixedLeft ? {left: fixedLeftPositions[i] || 0} : {}),
 										...(col.fixedRight ? {right: fixedRightPositions[i] || 0} : {}),
