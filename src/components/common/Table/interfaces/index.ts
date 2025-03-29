@@ -11,7 +11,6 @@ export interface PropsTable {
 		fixedRight?: boolean;
 		selectRow?: boolean;
 		isTitle?: any;
-		width?: number;
 	}[];
 	onSetData?: (any: any) => void;
 	isChild?: boolean;
