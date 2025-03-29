@@ -244,7 +244,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 				const matchedTime = data?.timeList?.find((t: any) => t?.timeScale === item?.timeScale);
 				return (
 					<span>
-						<p>{convertWeight(matchedTime?.weightBDMT)}</p> <p>{matchedTime?.drynessAvg!?.toFixed(2) || '---'} </p>
+						<p>{convertWeight(matchedTime?.weightBDMT)}</p> <p>{matchedTime?.drynessAvg!?.toFixed(2) || '---'} %</p>
 					</span>
 				);
 			},
@@ -322,28 +322,47 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						column={[
 							{
 								title: 'STT',
+								fixedLeft: true,
 								render: (data: any, index: number) => <>{index + 1}</>,
 							},
 							{
 								title: 'Nhà cung cấp',
 								fixedLeft: true,
 								render: (data: any) => (
-									<Link href={`/xuong/${data?.customerUu?.uuid}`} className={styles.link}>
-										{data?.customerUu?.name || '---'}
-									</Link>
+									<p className={styles.name}>
+										<Link href={`/xuong/${data?.customerUu?.uuid}`} className={styles.link}>
+											{data?.customerUu?.name || '---'}
+										</Link>
+									</p>
 								),
 							},
 
 							{
-								title: 'Sản lượng TB (Tấn)',
+								title: (
+									<span className={styles.unit}>
+										Sản lượng TB <br />
+										(Tấn)
+									</span>
+								),
 								render: (data: any) => <>{convertWeight(data?.abc)}</>,
 							},
 							{
-								title: 'Độ khô TB (%)',
+								title: (
+									<span className={styles.unit}>
+										Độ khô TB <br />
+										(%)
+									</span>
+								),
+								fixedLeft: true,
 								render: (data: any) => <>{data?.drynessAvg!?.toFixed(2)}</>,
 							},
 							{
-								title: 'Tổng lượng (Tấn)',
+								title: (
+									<span className={styles.unit}>
+										Tổng lượng <br />
+										(Tấn)
+									</span>
+								),
 								render: (data: any) => <>{convertWeight(data?.weightBDMT)}</>,
 							},
 							// {

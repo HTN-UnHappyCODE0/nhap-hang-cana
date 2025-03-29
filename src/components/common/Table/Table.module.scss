@@ -4,7 +4,7 @@
 	overflow: auto;
 
 	&.fixedHeader {
-		max-height: calc(100% - 48px); // height 100% - height Pagination
+		max-height: calc(100% - 48px);
 
 		thead {
 			position: sticky;
@@ -18,12 +18,10 @@
 		height: 12px;
 	}
 
-	/* Track */
 	&::-webkit-scrollbar-track {
 		background: #f8f8f8;
 	}
 
-	/* Handle */
 	&::-webkit-scrollbar-thumb {
 		background: #ccc;
 	}
@@ -43,7 +41,6 @@
 	th,
 	td {
 		padding: 12px;
-		// line-height: 18px;
 		white-space: nowrap;
 	}
 
@@ -55,10 +52,8 @@
 		padding-right: 24px;
 
 		&.checkBox {
-			// display: flex;
 			align-items: center;
 			gap: 8px;
-			// width: 100%;
 		}
 
 		&.textEnd {
@@ -97,14 +92,6 @@
 		font-size: 14px;
 		font-weight: 500;
 		border-bottom: 1px solid var(--border-color);
-		// background-color: var(--bg-light);
-
-		.checkBox {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			width: 100%;
-		}
 	}
 
 	tbody {
@@ -112,7 +99,6 @@
 		.fixedRight {
 			background: inherit;
 		}
-		// background-color: #fff;
 
 		.selectedRow {
 			background-color: #e2f1fb;
@@ -125,14 +111,6 @@
 		.fixedRight {
 			box-shadow: inset 2px 0 2px -2px rgba(0, 0, 0, 0.3);
 		}
-	}
-
-	.checkbox {
-		cursor: pointer;
-		user-select: none;
-		margin-right: 8px;
-		width: 18px;
-		height: 18px;
 	}
 
 	.tr_data:nth-child(even) {
