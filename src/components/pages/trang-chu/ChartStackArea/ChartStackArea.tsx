@@ -32,7 +32,6 @@ import companyServices from '~/services/companyServices';
 import moment from 'moment';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import wareServices from '~/services/wareServices';
-import Loading from '~/components/common/Loading';
 import commonServices from '~/services/commonServices';
 import SelectFilterMany from '../SelectFilterMany';
 import partnerServices from '~/services/partnerServices';
