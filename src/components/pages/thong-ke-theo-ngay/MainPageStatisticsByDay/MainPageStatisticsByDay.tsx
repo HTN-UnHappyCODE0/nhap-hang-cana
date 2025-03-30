@@ -344,6 +344,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 										(Tấn)
 									</span>
 								),
+								fixedLeft: true,
 								render: (data: any) => <>{convertWeight(data?.abc)}</>,
 							},
 							{
@@ -363,6 +364,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 										(Tấn)
 									</span>
 								),
+								fixedLeft: true,
 								render: (data: any) => <>{convertWeight(data?.weightBDMT)}</>,
 							},
 							// {
