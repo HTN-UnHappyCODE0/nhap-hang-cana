@@ -24,6 +24,8 @@ export enum QUERY_KEY {
 	dropdown_loai_hang,
 	dropdown_chat_luong,
 	dropdown_tram_can,
+	dropdown_xe_hang,
+	dropdown_ma_tau,
 
 	table_loai_go,
 	table_quoc_gia,
@@ -45,6 +47,8 @@ export enum QUERY_KEY {
 	table_lich_su_bai,
 	table_bai,
 	table_thong_ke_theo_ngay,
+	table_tram_can,
+	table_phieu_can_tat_ca,
 
 	chi_tiet_quy_cach,
 	chi_tiet_gia_tien_chinh_sua,
@@ -157,6 +161,7 @@ export enum TYPE_SIFT {
 export enum TYPE_BATCH {
 	CAN_LE,
 	CAN_LO,
+	KHONG_CAN,
 }
 
 export enum TYPE_SCALES {

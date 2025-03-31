@@ -25,9 +25,19 @@ const batchBillServices = {
 			shipUuid?: string;
 			typeCheckDay: number | 0;
 			scalesStationUuid: string | null;
+			storageUuid: string | null;
+			isHaveDryness?: number | null;
+			typeProduct?: number;
 			truckUuid: string[];
 			customerUuid: string;
 			listCustomerUuid: string[];
+			isNeedConfirmReject?: number;
+			companyUuid: string;
+			listIsBatch?: number[];
+			documentId?: string;
+			isExportSpec?: number;
+			listCompanyUuid?: string[];
+			listPartnerUuid?: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -229,6 +239,9 @@ const batchBillServices = {
 			warehouseUuid: string;
 			listCompanyUuid: string[];
 			listPartnerUuid: string[];
+			specificationUuid?: string;
+			productTypeUuid?: string;
+			qualityUuid?: string;
 		},
 		tokenAxios?: any
 	) => {

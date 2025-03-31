@@ -377,11 +377,9 @@ function ChartStackArea({}: PropsChartStackArea) {
 
 	useEffect(() => {
 		if (listProductType?.data?.length > 0) {
-			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid); // để
+			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid);
 		}
 	}, [listProductType.data]);
-
-	console.log('abc', uuidCompany);
 
 	return (
 		<div className={styles.container}>
