@@ -1,0 +1,98 @@
+.back {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+.header_title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	p {
+		color: var(--dark-2);
+		font-size: 20px;
+		font-weight: 600;
+	}
+}
+.list_btn {
+	display: flex;
+	gap: 8px;
+}
+
+.btn_LuPencil {
+	cursor: pointer;
+	user-select: none;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 12px;
+	border-radius: 2px;
+	border: 1px solid var(--border-color);
+	transition: 0.2s;
+
+	p {
+		color: var(--dark-2);
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	margin: 16px 0;
+}
+
+.main_search {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.search {
+	min-width: 320px;
+}
+
+.filter {
+	min-width: 100px;
+}
+
+.table {
+	margin-top: 16px;
+}
+
+.redText {
+	color: red;
+}
+
+.blueText {
+	color: blue;
+}
+
+.parameter {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	color: #777e90;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 600;
+	text-transform: uppercase;
+	span {
+		color: #171832;
+	}
+}
+
+.unit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	line-height: 1.5;
+}

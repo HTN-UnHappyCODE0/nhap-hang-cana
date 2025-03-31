@@ -41,12 +41,15 @@ import PopupAddPrice from '../PopupAddPrice/PopupAddPrice';
 import TagStatusSpecCustomer from '../TagStatusSpecCustomer';
 import IconCustom from '~/components/common/IconCustom';
 import PopupUpdatePrice from '../PopupUpdatePrice';
+import TabNavLink from '~/components/common/TabNavLink';
+import FullColumnFlex from '~/components/layouts/FlexLayout/components/FullColumnFlex';
+import TableImport from '../TableImport';
 
 function PageDetailWorkshop({}: PropsPageDetailWorkshop) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
-	const {_id, _page, _typeCus, _pageSize} = router.query;
+	const {_id, _page, _typeCus, _pageSize, _type} = router.query;
 
 	const [uuidUpdate, setUuidUpdate] = useState<string>('');
 	const [openCreate, setOpenCreate] = useState<boolean>(false);
@@ -272,99 +275,126 @@ function PageDetailWorkshop({}: PropsPageDetailWorkshop) {
 			</div>
 
 			<div className={clsx('mt')}>
-				<div className={styles.main_table}>
-					<h1 className={styles.list_title}>Danh sách hàng hóa</h1>
-					{detailCustomer?.status != STATUS_CUSTOMER.DA_XOA && (
-						<div>
-							<Button
-								p_8_16
-								icon={<Image alt='icon add' src={icons.add} width={20} height={20} />}
-								rounded_2
-								onClick={() => setOpenCreate(true)}
-							>
-								Thêm loại hàng
-							</Button>
-						</div>
-					)}
-				</div>
+				<TabNavLink
+					listHref={[
+						{
+							title: 'Danh sách hàng hóa',
+							pathname: router.pathname,
+							query: null,
+						},
+						{
+							title: 'Lịch sử nhập hàng',
+							pathname: router.pathname,
+							query: 'history-import',
+						},
+					]}
+					query='_type'
+				/>
 			</div>
+			<FullColumnFlex>
+				{!_type && (
+					<>
+						<div className={clsx('mt')}>
+							<div className={styles.main_table}>
+								{/* <h1 className={styles.list_title}>Danh sách hàng hóa</h1> */}
+								<div></div>
+								{detailCustomer?.status != STATUS_CUSTOMER.DA_XOA && (
+									<div>
+										<Button
+											p_8_16
+											icon={<Image alt='icon add' src={icons.add} width={20} height={20} />}
+											rounded_2
+											onClick={() => setOpenCreate(true)}
+										>
+											Thêm loại hàng
+										</Button>
+									</div>
+								)}
+							</div>
+						</div>
 
-			<div className={clsx('mt')}>
-				<div className={styles.table}>
-					<DataWrapper
-						data={detailCustomer?.customerSpec || []}
-						// loading={detailCustomer.isloading}
-						noti={<Noti disableButton des='Hiện tại chưa có hàng hóa nào!' />}
-					>
-						<Table
-							data={detailCustomer?.customerSpec || []}
-							column={[
-								{
-									title: 'STT',
-									render: (data: IlistCustomerSpec, index: number) => <>{index + 1}</>,
-								},
-								{
-									title: 'Loại hàng',
-									fixedLeft: true,
-									render: (data: IlistCustomerSpec) => <>{data?.productTypeUu?.name || '---'}</>,
-								},
-								{
-									title: 'Quốc gia',
-									render: (data: IlistCustomerSpec) => <>{data?.qualityUu?.name || '---'}</>,
-								},
-								{
-									title: 'Quy cách',
-									render: (data: IlistCustomerSpec) => <>{data?.specUu?.name || '---'}</>,
-								},
-								{
-									title: 'Bãi',
-									render: (data: IlistCustomerSpec) => <>{data?.storageUu?.name || '---'}</>,
-								},
-								{
-									title: 'Vận chuyển',
-									render: (data: IlistCustomerSpec) => (
-										<>
-											{data?.transportType == TYPE_TRANSPORT.DUONG_BO && 'Đường bộ'}
-											{data?.transportType == TYPE_TRANSPORT.DUONG_THUY && 'Đường thủy'}
-										</>
-									),
-								},
-								{
-									title: 'Giá tiền (VNĐ)',
-									render: (data: IlistCustomerSpec) => (
-										<p style={{fontWeight: '600', color: '#3772FF'}}>{convertCoin(data?.pricetagUu?.amount)}</p>
-									),
-								},
-								{
-									title: 'Cung cấp',
-									render: (data: IlistCustomerSpec) => <TagStatusSpecCustomer status={data.state} />,
-								},
-								{
-									title: 'Tác vụ',
-									fixedRight: true,
-									render: (data: IlistCustomerSpec) => (
-										<div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
-											<IconCustom
-												edit
-												icon={<LuPencil fontSize={20} fontWeight={600} />}
-												tooltip='Cập nhật bãi'
-												color='#777E90'
-												onClick={() => setUuidUpdate(data?.uuid)}
-											/>
-										</div>
-									),
-								},
-							]}
-						/>
-					</DataWrapper>
-					{/* <Pagination
+						<div className={clsx('mt')}>
+							<div className={styles.table}>
+								<DataWrapper
+									data={detailCustomer?.customerSpec || []}
+									// loading={detailCustomer.isloading}
+									noti={<Noti disableButton des='Hiện tại chưa có hàng hóa nào!' />}
+								>
+									<Table
+										data={detailCustomer?.customerSpec || []}
+										column={[
+											{
+												title: 'STT',
+												render: (data: IlistCustomerSpec, index: number) => <>{index + 1}</>,
+											},
+											{
+												title: 'Loại hàng',
+												fixedLeft: true,
+												render: (data: IlistCustomerSpec) => <>{data?.productTypeUu?.name || '---'}</>,
+											},
+											{
+												title: 'Quốc gia',
+												render: (data: IlistCustomerSpec) => <>{data?.qualityUu?.name || '---'}</>,
+											},
+											{
+												title: 'Quy cách',
+												render: (data: IlistCustomerSpec) => <>{data?.specUu?.name || '---'}</>,
+											},
+											{
+												title: 'Bãi',
+												render: (data: IlistCustomerSpec) => <>{data?.storageUu?.name || '---'}</>,
+											},
+											{
+												title: 'Vận chuyển',
+												render: (data: IlistCustomerSpec) => (
+													<>
+														{data?.transportType == TYPE_TRANSPORT.DUONG_BO && 'Đường bộ'}
+														{data?.transportType == TYPE_TRANSPORT.DUONG_THUY && 'Đường thủy'}
+													</>
+												),
+											},
+											{
+												title: 'Giá tiền (VNĐ)',
+												render: (data: IlistCustomerSpec) => (
+													<p style={{fontWeight: '600', color: '#3772FF'}}>
+														{convertCoin(data?.pricetagUu?.amount)}
+													</p>
+												),
+											},
+											{
+												title: 'Cung cấp',
+												render: (data: IlistCustomerSpec) => <TagStatusSpecCustomer status={data.state} />,
+											},
+											{
+												title: 'Tác vụ',
+												fixedRight: true,
+												render: (data: IlistCustomerSpec) => (
+													<div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+														<IconCustom
+															edit
+															icon={<LuPencil fontSize={20} fontWeight={600} />}
+															tooltip='Cập nhật bãi'
+															color='#777E90'
+															onClick={() => setUuidUpdate(data?.uuid)}
+														/>
+													</div>
+												),
+											},
+										]}
+									/>
+								</DataWrapper>
+								{/* <Pagination
 						currentPage={Number(_page) || 1}
 						pageSize={Number(_pageSize) || 200}
 						total={listPriceTagCustomer?.data?.pagination?.totalCount}
 						dependencies={[_id, _pageSize]}
 					/> */}
-				</div>
-			</div>
+							</div>
+						</div>
+					</>
+				)}
+				{_type == 'history-import' && <TableImport uuid={_id as string} />}
+			</FullColumnFlex>
 
 			<Dialog
 				danger

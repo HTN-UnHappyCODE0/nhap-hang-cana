@@ -105,14 +105,18 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 
 	const fixedRightPositions = useMemo(() => {
 		let right = 0;
-		return column.map((col, index) => {
-			if (col.fixedRight) {
-				const position = right;
-				right += columnWidths[index] || 0;
-				return position;
-			}
-			return null;
-		});
+		return column
+			.slice()
+			.reverse()
+			.map((col, index) => {
+				if (col.fixedRight) {
+					const position = right;
+					right += columnWidths[column.length - 1 - index] || 0;
+					return position;
+				}
+				return null;
+			})
+			.reverse();
 	}, [column, columnWidths]);
 
 	return (

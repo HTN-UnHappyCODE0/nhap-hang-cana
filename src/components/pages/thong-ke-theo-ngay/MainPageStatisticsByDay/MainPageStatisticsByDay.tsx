@@ -12,6 +12,7 @@ import {
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
 	TYPE_PARTNER,
+	TYPE_PRODUCT,
 } from '~/constants/config/enum';
 import {useQuery} from '@tanstack/react-query';
 import {httpRequest} from '~/services';
@@ -29,6 +30,11 @@ import partnerServices from '~/services/partnerServices';
 import storageServices from '~/services/storageServices';
 import DateRangerCustom from '~/components/common/DateRangerCustom';
 import moment from 'moment';
+import Search from '~/components/common/Search';
+import commonServices from '~/services/commonServices';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import wareServices from '~/services/wareServices';
+import Loading from '~/components/common/Loading';
 
 function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const router = useRouter();
@@ -38,10 +44,14 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const [listStatisticsByDay, setListStatisticsByDay] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [uuidCompany, setUuidCompany] = useState<string>('');
+	const [uuidProduct, setUuidProduct] = useState<string>('');
+	const [uuidQuality, setUuidQuality] = useState<string>('');
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
 	const [uuidStorage, setUuidStorage] = useState<string>('');
+	const [uuidSpec, setUuidSpec] = useState<string>('');
 	const [listCompanyUuid, setListCompanyUuid] = useState<any[]>([]);
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
+	const [provinceUuid, setProvinceUuid] = useState<string>('');
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
 		queryFn: () =>
@@ -62,7 +72,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		},
 	});
 
-	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap], {
+	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, listCompanyUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -77,6 +87,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					userUuid: '',
 					provinceId: '',
 					type: TYPE_PARTNER.NCC,
+					listCompanyUuid: listCompanyUuid,
 				}),
 			}),
 		select(data) {
@@ -135,6 +146,80 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		},
 	});
 
+	const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listProductType({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					status: CONFIG_STATUS.HOAT_DONG,
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					type: [TYPE_PRODUCT.CONG_TY],
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listQuality({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listProvince = useQuery([QUERY_KEY.dropdown_tinh_thanh_pho], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: commonServices.listProvince({
+					keyword: '',
+					status: CONFIG_STATUS.HOAT_DONG,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listSpecifications = useQuery([QUERY_KEY.dropdown_quy_cach, uuidProduct, uuidQuality], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listSpecification({
+					page: 1,
+					pageSize: 100,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+					qualityUuid: uuidQuality,
+					productTypeUuid: uuidProduct,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
 	const formatTimeScale = (timeScale: string, typeShow: number) => {
 		if (typeShow === TYPE_DATE_SHOW.HOUR) {
 			return moment(timeScale).format('HH:mm');
@@ -145,6 +230,30 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		}
 		return moment(timeScale).format('YYYY');
 	};
+
+	useEffect(() => {
+		if (listCompanyUuid) {
+			setCustomerUuid([]);
+		}
+		if (listPartnerUuid) {
+			setCustomerUuid([]);
+		}
+	}, [listCompanyUuid, listPartnerUuid]);
+
+	useEffect(() => {
+		if (listCompanyUuid) {
+			setListPartnerUuid([]);
+		}
+	}, [listCompanyUuid]);
+
+	useEffect(() => {
+		if (uuidProduct) {
+			setUuidSpec('');
+		}
+		if (uuidQuality) {
+			setUuidSpec('');
+		}
+	}, [uuidProduct, uuidQuality]);
 
 	const convertData = (data: any) => {
 		return data?.lstProductDay?.reduce((acc: any, item: any) => {
@@ -188,6 +297,10 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 			_dateTo,
 			listCompanyUuid,
 			listPartnerUuid,
+			provinceUuid,
+			uuidSpec,
+			uuidProduct,
+			uuidQuality,
 		],
 		{
 			queryFn: () =>
@@ -199,7 +312,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						customerUuid: customerUuid,
 						isShowBDMT: 0,
 						partnerUuid: '',
-						provinceId: '',
+						provinceId: provinceUuid,
 						storageUuid: uuidStorage,
 						timeStart: _dateFrom ? (_dateFrom as string) : null,
 						timeEnd: _dateTo ? (_dateTo as string) : null,
@@ -210,6 +323,9 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						warehouseUuid: '',
 						listCompanyUuid: listCompanyUuid,
 						listPartnerUuid: listPartnerUuid,
+						specificationUuid: uuidSpec,
+						productTypeUuid: uuidProduct,
+						qualityUuid: uuidQuality,
 					}),
 				}),
 			onSuccess(data) {
@@ -295,15 +411,43 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						name='Nhà cung cấp'
 					/>
 
-					{/* <SelectFilterState
-						uuid={uuidStorage}
-						setUuid={setUuidStorage}
-						listData={listStorage?.data?.map((v: any) => ({
+					<SelectFilterState
+						uuid={provinceUuid}
+						setUuid={setProvinceUuid}
+						listData={listProvince?.data?.map((v: any) => ({
+							uuid: v?.matp,
+							name: v?.name,
+						}))}
+						placeholder='Tất cả tỉnh thành'
+					/>
+					<SelectFilterState
+						uuid={uuidProduct}
+						setUuid={setUuidProduct}
+						listData={listProductType?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Bãi'
-					/> */}
+						placeholder='Tất cả loại hàng'
+					/>
+
+					<SelectFilterState
+						uuid={uuidQuality}
+						setUuid={setUuidQuality}
+						listData={listQuality?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Quốc gia'
+					/>
+					<SelectFilterState
+						uuid={uuidSpec}
+						setUuid={setUuidSpec}
+						listData={listSpecifications?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Tất cả quy cách'
+					/>
 
 					<div className={styles.filter}>
 						<DateRangerCustom titleTime='Thời gian' typeDateDefault={TYPE_DATE.YESTERDAY} />
