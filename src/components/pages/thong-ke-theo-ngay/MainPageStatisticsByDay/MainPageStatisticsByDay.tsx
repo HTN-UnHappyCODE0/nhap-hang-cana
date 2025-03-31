@@ -489,7 +489,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 									</span>
 								),
 								fixedLeft: true,
-								render: (data: any) => <>{convertWeight(data?.abc)}</>,
+								render: (data: any) => <>{convertWeight(data?.weightBDMTAvg)}</>,
 							},
 							{
 								title: (
