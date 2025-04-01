@@ -169,6 +169,7 @@ const batchBillServices = {
 			transportType: number | null;
 			listCompanyUuid: string[];
 			listPartnerUuid: string[];
+			userPartnerUuid?: string;
 		},
 		tokenAxios?: any
 	) => {
