@@ -78,7 +78,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 		},
 	});
 
-	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany], {
+	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany, userUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -90,7 +90,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					isPaging: CONFIG_PAGING.NO_PAGING,
-					userUuid: '',
+					userUuid: userUuid,
 					provinceId: '',
 					type: TYPE_PARTNER.NCC,
 					listCompanyUuid: uuidCompany,
@@ -381,6 +381,12 @@ function ChartStackArea({}: PropsChartStackArea) {
 		}
 	}, [listProductType.data]);
 
+	useEffect(() => {
+		if (userUuid) {
+			setListPartnerUuid([]);
+		}
+	}, [userUuid]);
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
@@ -395,6 +401,20 @@ function ChartStackArea({}: PropsChartStackArea) {
 						}))}
 						placeholder='Tất cả kv cảng xuất khẩu'
 					/>
+					<CheckRegencyCode
+						isPage={false}
+						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
+					>
+						<SelectFilterOption
+							uuid={userUuid}
+							setUuid={setUserUuid}
+							listData={listUser?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.fullName,
+							}))}
+							placeholder='Tất cả người quản lý công ty'
+						/>
+					</CheckRegencyCode>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
 						setSelectedIds={setListPartnerUuid}
@@ -404,6 +424,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 						}))}
 						placeholder='Công ty'
 					/>
+
 					<SelectFilterMany
 						isShowAll={false}
 						selectedIds={customerUuid}
@@ -425,20 +446,6 @@ function ChartStackArea({}: PropsChartStackArea) {
 						placeholder='Tất cả loại hàng'
 					/>
 					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<SelectFilterOption
-							uuid={userUuid}
-							setUuid={setUserUuid}
-							listData={listUser?.data?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.fullName,
-							}))}
-							placeholder='Tất cả người quản lý mua hàng'
-						/>
-					</CheckRegencyCode>
 
 					<SelectFilterMany
 						selectedIds={provinceUuid}

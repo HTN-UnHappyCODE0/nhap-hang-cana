@@ -75,7 +75,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		lstProductTotal: [],
 	});
 
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany], {
+	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, userUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -87,7 +87,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					partnerUUid: '',
-					userUuid: '',
+					userUuid: userUuid,
 					status: STATUS_CUSTOMER.HOP_TAC,
 					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
 					provinceId: '',
@@ -346,6 +346,12 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		}
 	}, [uuidCompany]);
 
+	useEffect(() => {
+		if (userUuid) {
+			setCustomerUuid([]);
+		}
+	}, [userUuid]);
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
@@ -395,6 +401,29 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Tất cả nhà cung cấp'
 					/> */}
+					<SelectFilterState
+						uuid={userPartnerUuid}
+						setUuid={setUserPartnerUuid}
+						listData={listUserPurchasing?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.fullName,
+						}))}
+						placeholder='Tất cả quản lý công ty'
+					/>
+					<CheckRegencyCode
+						isPage={false}
+						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
+					>
+						<SelectFilterOption
+							uuid={userUuid}
+							setUuid={setUserUuid}
+							listData={listUserMarket?.data?.map((v: any) => ({
+								uuid: v?.uuid,
+								name: v?.fullName,
+							}))}
+							placeholder='Tất cả người quản lý xưởng'
+						/>
+					</CheckRegencyCode>
 					<SelectFilterMany
 						selectedIds={customerUuid}
 						setSelectedIds={setCustomerUuid}
@@ -414,30 +443,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						placeholder='Tất cả bãi'
 					/>
 					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<SelectFilterOption
-							uuid={userUuid}
-							setUuid={setUserUuid}
-							listData={listUserMarket?.data?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.fullName,
-							}))}
-							placeholder='Tất cả người quản lý xưởng'
-						/>
-					</CheckRegencyCode>
 
-					<SelectFilterState
-						uuid={userPartnerUuid}
-						setUuid={setUserPartnerUuid}
-						listData={listUserPurchasing?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.fullName,
-						}))}
-						placeholder='Tất cả quản lý công ty'
-					/>
 					<SelectFilterOption
 						isShowAll={false}
 						uuid={isProductSpec}
