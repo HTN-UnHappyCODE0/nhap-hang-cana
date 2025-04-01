@@ -530,7 +530,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 						<YAxis domain={[0, 4000000]} tickFormatter={(value): any => convertWeight(value)} />
 
-						<YAxis yAxisId='right' domain={[0, 100]} orientation='right' tickFormatter={(v) => `${v}%`} />
+						<YAxis yAxisId='right' domain={[25, 75]} orientation='right' tickFormatter={(v) => `${v}%`} />
 
 						<Tooltip
 							formatter={(value, name, props): any => {
