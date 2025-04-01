@@ -57,8 +57,9 @@ export enum PATH {
 	// Kho hàng
 	KhoHang = '/kho-hang',
 
-	// Thống kê theo ngày
-	ThongKeTheoNgay = '/thong-ke-theo-ngay',
+	// Thống kê sản lượng
+	ThongKeSanLuong = '/thong-ke-san-luong',
+	ThongKeChatLuong = '/thong-ke-chat-luong',
 }
 
 export const Menu: {
@@ -163,10 +164,26 @@ export const Menu: {
 					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
 				],
 			},
+		],
+	},
+	{
+		title: 'Phân tích số liệu',
+		group: [
 			{
-				title: 'Thống kê theo ngày',
+				title: 'Thống kê sản lượng',
 				icon: icons.thongkethoethang,
-				path: PATH.ThongKeTheoNgay,
+				path: PATH.ThongKeSanLuong,
+				regencys: [
+					REGENCY_CODE.GIAM_DOC,
+					REGENCY_CODE.PHO_GIAM_DOC,
+					REGENCY_CODE.QUAN_LY_NHAP_HANG,
+					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
+				],
+			},
+			{
+				title: 'Thống kê chất lượng',
+				icon: icons.thongkethoethang,
+				path: PATH.ThongKeChatLuong,
 				regencys: [
 					REGENCY_CODE.GIAM_DOC,
 					REGENCY_CODE.PHO_GIAM_DOC,
