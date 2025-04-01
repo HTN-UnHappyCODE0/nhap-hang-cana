@@ -7,7 +7,7 @@ import {PropsDateTypeOption} from './interfaces';
 import {TYPE_DATE} from '~/constants/config/enum';
 import {useRouter} from 'next/router';
 
-function DateTypeOption({date, show, setDate, setShow, keyTypeDate, keyDateForm, keyDateTo}: PropsDateTypeOption) {
+function DateTypeOption({date, show, setDate, setShow, keyTypeDate, keyDateForm, keyDateTo, typeDateNotShow = []}: PropsDateTypeOption) {
 	const router = useRouter();
 
 	const {[keyTypeDate]: typeDate} = router.query;
@@ -72,14 +72,14 @@ function DateTypeOption({date, show, setDate, setShow, keyTypeDate, keyDateForm,
 				>
 					<p>{'Tất cả'}</p>
 				</div> */}
-				{ListOptionTimePicker.map((v, i) => (
+				{ListOptionTimePicker.filter((v) => !typeDateNotShow.includes(v.value)).map((v, i) => (
 					<div
 						key={i}
 						className={clsx(styles.option, {
 							[styles.option_active]: Number(typeDate) == v.value,
 						})}
 						onClick={() => {
-							if (v.value != TYPE_DATE.LUA_CHON) {
+							if (v.value !== TYPE_DATE.LUA_CHON) {
 								setShow(false);
 							}
 							setQuery(v.value);

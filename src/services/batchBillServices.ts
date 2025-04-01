@@ -233,7 +233,7 @@ const batchBillServices = {
 			timeEnd: string | null;
 			isShowBDMT: number;
 			typeShow: number;
-			transportType: number;
+			transportType: number | null;
 			storageUuid: string;
 			provinceId: string;
 			customerUuid: string[];
@@ -261,7 +261,7 @@ const batchBillServices = {
 			timeEnd: string | null;
 			isShowBDMT: number;
 			typeShow: number;
-			transportType: number;
+			transportType: number | null;
 			storageUuid: string;
 			provinceId: string;
 			customerUuid: string[];

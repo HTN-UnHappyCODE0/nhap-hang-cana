@@ -29,6 +29,7 @@ const criteriaServices = {
 			typeFind: CONFIG_TYPE_FIND;
 			isPaging: CONFIG_PAGING;
 			specificationUuid: string;
+			qualityUuid?: string;
 		},
 		tokenAxios?: any
 	) => {

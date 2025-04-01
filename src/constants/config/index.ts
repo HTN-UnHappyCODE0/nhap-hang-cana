@@ -182,7 +182,7 @@ export const Menu: {
 			},
 			{
 				title: 'Thống kê chất lượng',
-				icon: icons.thongkethoethang,
+				icon: icons.thongkechatluong,
 				path: PATH.ThongKeChatLuong,
 				regencys: [
 					REGENCY_CODE.GIAM_DOC,

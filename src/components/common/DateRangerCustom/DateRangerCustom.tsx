@@ -19,6 +19,7 @@ function DateRangerCustom({
 	keyDateForm = '_dateFrom',
 	keyDateTo = '_dateTo',
 	typeDateDefault = TYPE_DATE.THIS_WEEK,
+	typeDateNotShow = [],
 }: PropsDateRangerCustom) {
 	const router = useRouter();
 
@@ -93,6 +94,7 @@ function DateRangerCustom({
 					keyTypeDate={keyTypeDate}
 					keyDateForm={keyDateForm}
 					keyDateTo={keyDateTo}
+					typeDateNotShow={typeDateNotShow}
 				/>
 			)}
 		>
