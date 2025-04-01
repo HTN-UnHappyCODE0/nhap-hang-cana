@@ -9,4 +9,5 @@ export interface PropsDateTypeOption {
 	keyTypeDate: string;
 	keyDateForm: string;
 	keyDateTo: string;
+	typeDateNotShow?: number[];
 }

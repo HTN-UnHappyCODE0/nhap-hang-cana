@@ -401,7 +401,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						storageUuid: uuidStorage,
 						timeStart: _dateFrom ? (_dateFrom as string) : null,
 						timeEnd: _dateTo ? (_dateTo as string) : null,
-						transportType: 0,
+						transportType: null,
 						typeFindDay: 0,
 						typeShow: 0,
 						userOwnerUuid: userOwnerUuid,
@@ -446,7 +446,8 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 				const matchedTime = data?.timeList?.find((t: any) => t?.timeScale === item?.timeScale);
 				return (
 					<span>
-						<p>{convertWeight(matchedTime?.weightBDMT)}</p> <p>{matchedTime?.drynessAvg!?.toFixed(2) || '---'} %</p>
+						<p>{convertWeight(matchedTime?.weightBDMT)}</p>{' '}
+						<p style={{color: '#2367ed'}}>{matchedTime?.drynessAvg!?.toFixed(2) || '---'} %</p>
 					</span>
 				);
 			},
@@ -460,8 +461,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 			setCustomerUuid([]);
 		}
 	}, [listCompanyUuid, listPartnerUuid]);
-
-	console.log('listStatisticsByDay', listStatisticsByDay);
 
 	return (
 		<div className={styles.container}>
@@ -559,7 +558,11 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					/>
 
 					<div className={styles.filter}>
-						<DateRangerCustom titleTime='Thời gian' typeDateDefault={TYPE_DATE.YESTERDAY} />
+						<DateRangerCustom
+							titleTime='Thời gian'
+							typeDateDefault={TYPE_DATE.THIS_YEAR}
+							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
+						/>
 					</div>
 				</div>
 			</div>
@@ -608,7 +611,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 									</span>
 								),
 								fixedLeft: true,
-								render: (data: any) => <p style={{color: '#2367ed'}}>{data?.drynessAvg!?.toFixed(2)}</p>,
+								render: (data: any) => <p style={{color: '#2367ed'}}>{data?.drynessAvg!?.toFixed(2)} %</p>,
 							},
 							{
 								title: (
@@ -617,7 +620,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 										(Tấn)
 									</span>
 								),
-								fixedLeft: true,
 								render: (data: any) => <>{convertWeight(data?.weightBDMT)}</>,
 							},
 							// {

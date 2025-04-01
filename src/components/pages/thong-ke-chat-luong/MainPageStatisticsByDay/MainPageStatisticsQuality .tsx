@@ -233,11 +233,11 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 					productTypeUuid: uuidProduct,
 				}),
 			}),
-		onSuccess(data) {
-			if (data) {
-				setUuidSpec(data[0]?.uuid);
-			}
-		},
+		// onSuccess(data) {
+		// 	if (data) {
+		// 		setUuidSpec(data[0]?.uuid);
+		// 	}
+		// },
 		select(data) {
 			return data;
 		},
@@ -307,7 +307,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 		enabled: listRegency.isSuccess,
 	});
 
-	const listCriteria = useQuery([QUERY_KEY.dropdown_tieu_chi_quy_cach, uuidSpec], {
+	const listCriteria = useQuery([QUERY_KEY.dropdown_tieu_chi_quy_cach, uuidSpec, uuidQuality], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -320,6 +320,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					status: CONFIG_STATUS.HOAT_DONG,
 					specificationUuid: uuidSpec,
+					qualityUuid: uuidQuality,
 				}),
 			}),
 		onSuccess(data) {
@@ -371,7 +372,10 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 		if (uuidSpec) {
 			setUuidCriteria(listCriteria?.data?.[0]?.uuid || '');
 		}
-	}, [uuidSpec]);
+		if (uuidQuality) {
+			setUuidCriteria(listCriteria?.data?.[0]?.uuid || '');
+		}
+	}, [uuidSpec, uuidQuality]);
 
 	useEffect(() => {
 		if (userPartnerUuid) {
@@ -448,7 +452,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						storageUuid: uuidStorage,
 						timeStart: _dateFrom ? (_dateFrom as string) : null,
 						timeEnd: _dateTo ? (_dateTo as string) : null,
-						transportType: 0,
+						transportType: null,
 						typeFindDay: 0,
 						typeShow: 0,
 						userOwnerUuid: userOwnerUuid,
@@ -594,7 +598,6 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						placeholder='Quốc gia'
 					/>
 					<SelectFilterState
-						isShowAll={false}
 						uuid={uuidSpec}
 						setUuid={setUuidSpec}
 						listData={listSpecifications?.data?.map((v: any) => ({
@@ -615,7 +618,11 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 					/>
 
 					<div className={styles.filter}>
-						<DateRangerCustom titleTime='Thời gian' typeDateDefault={TYPE_DATE.YESTERDAY} />
+						<DateRangerCustom
+							titleTime='Thời gian'
+							typeDateDefault={TYPE_DATE.THIS_YEAR}
+							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
+						/>
 					</div>
 				</div>
 			</div>
@@ -654,7 +661,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 									</span>
 								),
 								fixedLeft: true,
-								render: (data: any) => <>{data?.percentAvg!?.toFixed(2)}</>,
+								render: (data: any) => <>{data?.percentAvg!?.toFixed(2)} %</>,
 							},
 
 							// {

@@ -55,6 +55,7 @@ import giatienhangchinhsua from '../../../public/static/images/giahangchinhsua.s
 import giatienhangtuonglai from '../../../public/static/images/dollar-circle.svg';
 import duyetdokho from '../../../public/static/images/clipboard-tick.svg';
 import thongkethoethang from '../../../public/static/images/thongketheothang.svg';
+import thongkechatluong from '../../../public/static/images/chart_qua.png';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
 	tongQuan,
@@ -112,5 +113,7 @@ export default {
 	khoiluonghangxuatthang,
 	giatienhangchinhsua,
 	giatienhangtuonglai,
-	duyetdokho,thongkethoethang,
+	duyetdokho,
+	thongkethoethang,
+	thongkechatluong,
 };

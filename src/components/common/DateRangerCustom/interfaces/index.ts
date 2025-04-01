@@ -6,4 +6,5 @@ export interface PropsDateRangerCustom {
 	keyDateForm?: string;
 	keyDateTo?: string;
 	typeDateDefault?: TYPE_DATE;
+	typeDateNotShow?: TYPE_DATE[];
 }
