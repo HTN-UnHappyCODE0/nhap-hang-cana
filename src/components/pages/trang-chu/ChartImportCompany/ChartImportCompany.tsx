@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {PropsChartImportCompany} from './interfaces';
 import styles from './ChartImportCompany.module.scss';
 
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line} from 'recharts';
 import SelectFilterOption from '../SelectFilterOption';
 import SelectFilterDate from '../SelectFilterDate';
 import {useQuery} from '@tanstack/react-query';
@@ -36,6 +36,7 @@ import companyServices from '~/services/companyServices';
 import commonServices from '~/services/commonServices';
 import SelectFilterMany from '../SelectFilterMany';
 import {convertCoin} from '~/common/funcs/convertCoin';
+import SelectFilterState from '~/components/common/SelectFilterState';
 
 function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isShowBDMT, setIsShowBDMT] = useState<string>(String(TYPE_SHOW_BDMT.MT));
@@ -54,6 +55,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 	const [dataChartMT, setDataChartMT] = useState<any[]>([]);
 	const [dataChartBDMT, setDataChartBDMT] = useState<any[]>([]);
+	const [userPartnerUuid, setUserPartnerUuid] = useState<string>('');
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [dataTotal, setDataTotal] = useState<{
 		totalWeight: number;
@@ -173,11 +175,11 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		},
 	});
 
-	const listUser = useQuery([QUERY_KEY.dropdown_nguoi_quan_ly], {
+	const listUserPurchasing = useQuery([QUERY_KEY.dropdown_quan_ly_nhap_hang], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
-				http: userServices.listUser({
+				http: userServices.listUser2({
 					page: 1,
 					pageSize: 50,
 					keyword: '',
@@ -186,10 +188,30 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					status: CONFIG_STATUS.HOAT_DONG,
 					provinceIDOwer: '',
-					regencyUuid: listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])
-						? listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])?.uuid
-						: null,
-					regencyUuidExclude: '',
+					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])?.uuid],
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+		enabled: listRegency.isSuccess,
+	});
+
+	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: userServices.listUser2({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+					provinceIDOwer: '',
+					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Nhân viên thị trường'])?.uuid],
+					parentUuid: '',
 				}),
 			}),
 		select(data) {
@@ -209,6 +231,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			isProductSpec,
 			provinceUuid,
 			isTransport,
+			userPartnerUuid,
 		],
 		{
 			queryFn: () =>
@@ -220,7 +243,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						isShowBDMT: 1,
 						storageUuid: storageUuid,
 						userOwnerUuid: userUuid,
-						warehouseUuid: '',
+						warehouseUuid: userPartnerUuid,
 						companyUuid: '',
 						typeFindDay: 0,
 						timeStart: timeSubmit(date?.from)!,
@@ -245,7 +268,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
 						acc[item.productTypeUu.name] = item.weightMT;
-						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg;
+						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg || 50;
 						return acc;
 					}, {});
 
@@ -267,7 +290,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
 						acc[item.productTypeUu.name] = item.weightBDMT;
-						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg;
+						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg || 50;
 						return acc;
 					}, {});
 
@@ -398,13 +421,23 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						<SelectFilterOption
 							uuid={userUuid}
 							setUuid={setUserUuid}
-							listData={listUser?.data?.map((v: any) => ({
+							listData={listUserMarket?.data?.map((v: any) => ({
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							placeholder='Tất cả người quản lý mua hàng'
+							placeholder='Tất cả người quản lý xưởng'
 						/>
 					</CheckRegencyCode>
+
+					<SelectFilterState
+						uuid={userPartnerUuid}
+						setUuid={setUserPartnerUuid}
+						listData={listUserPurchasing?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.fullName,
+						}))}
+						placeholder='Tất cả quản lý công ty'
+					/>
 					<SelectFilterOption
 						isShowAll={false}
 						uuid={isProductSpec}
@@ -474,7 +507,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			</div>
 			<div className={styles.main_chart}>
 				<ResponsiveContainer width='100%' height='100%'>
-					<BarChart
+					<ComposedChart
 						width={500}
 						height={300}
 						data={isShowBDMT === String(TYPE_SHOW_BDMT.MT) ? dataChartMT : dataChartBDMT}
@@ -487,7 +520,11 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						barSize={24}
 					>
 						<XAxis dataKey='name' scale='point' padding={{left: 40, right: 10}} />
+
 						<YAxis domain={[0, 4000000]} tickFormatter={(value): any => convertWeight(value)} />
+
+						<YAxis yAxisId='right' domain={[0, 100]} orientation='right' tickFormatter={(v) => `${v}%`} />
+
 						<Tooltip
 							formatter={(value, name, props): any => {
 								const dryness = props?.payload?.[`${name}_drynessAvg`] ?? 0;
@@ -496,10 +533,22 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						/>
 
 						<CartesianGrid strokeDasharray='3 3' vertical={false} />
+
 						{productTypes.map((v, i) => (
 							<Bar key={i} dataKey={v?.key} stackId='product_type' fill={v?.fill} />
 						))}
-					</BarChart>
+
+						{productTypes.map((v, i) => (
+							<Line
+								key={`line-${i}`}
+								tooltipType='none'
+								dataKey={`${v?.key}_drynessAvg`}
+								stroke={v?.fill}
+								fill={v?.fill}
+								yAxisId='right'
+							/>
+						))}
+					</ComposedChart>
 				</ResponsiveContainer>
 			</div>
 		</div>
