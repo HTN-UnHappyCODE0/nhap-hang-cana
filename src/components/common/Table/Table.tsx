@@ -89,7 +89,7 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 		return () => {
 			window.removeEventListener('resize', updateColumnWidths);
 		};
-	}, []);
+	}, [data]);
 
 	const fixedLeftPositions = useMemo(() => {
 		let left = 0;
