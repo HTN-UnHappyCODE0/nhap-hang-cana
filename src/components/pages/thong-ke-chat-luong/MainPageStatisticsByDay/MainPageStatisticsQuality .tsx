@@ -311,7 +311,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
-				http: criteriaServices.listCriteria({
+				http: criteriaServices.listCriteriaSpec({
 					page: 1,
 					pageSize: 50,
 					keyword: '',
