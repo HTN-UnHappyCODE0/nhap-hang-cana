@@ -486,7 +486,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý công ty'
+						placeholder='Quản lý nhập hàng'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -504,7 +504,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý xưởng'
+						placeholder='Quản lý nhân viên thị trường'
 					/>
 					<SelectFilterMany
 						selectedIds={customerUuid}
@@ -523,7 +523,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả tỉnh thành'
+						placeholder='Tỉnh thành'
 					/>
 					<SelectFilterState
 						isShowAll={false}
@@ -533,7 +533,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả loại hàng'
+						placeholder='Loại hàng'
 					/>
 
 					<SelectFilterState
@@ -554,13 +554,13 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả quy cách'
+						placeholder='Quy cách'
 					/>
 
 					<div className={styles.filter}>
 						<DateRangerCustom
 							titleTime='Thời gian'
-							typeDateDefault={TYPE_DATE.THIS_YEAR}
+							typeDateDefault={TYPE_DATE.LAST_7_DAYS}
 							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
 						/>
 					</div>
