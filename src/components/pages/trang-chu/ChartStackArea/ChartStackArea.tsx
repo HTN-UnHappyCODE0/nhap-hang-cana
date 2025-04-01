@@ -412,7 +412,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							placeholder='Tất cả người quản lý công ty'
+							placeholder='Tất cả quản lý nhập hàng'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany

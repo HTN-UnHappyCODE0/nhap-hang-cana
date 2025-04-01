@@ -409,7 +409,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý công ty'
+						placeholder='Tất cả quản lý nhập hàng'
 					/>
 					<CheckRegencyCode
 						isPage={false}
@@ -422,7 +422,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							placeholder='Tất cả người quản lý xưởng'
+							placeholder='Tất cả người quản lý nhân viên thị trường'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany
