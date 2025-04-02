@@ -15,6 +15,7 @@ const partnerServices = {
 			provinceId: string;
 			type: number | null;
 			listCompanyUuid?: string[];
+			listUserUuid?: string[];
 		},
 		tokenAxios?: any
 	) => {

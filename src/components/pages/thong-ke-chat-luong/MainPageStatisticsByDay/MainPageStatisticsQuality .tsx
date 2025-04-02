@@ -51,15 +51,15 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 	const [uuidCompany, setUuidCompany] = useState<string>('');
 	const [uuidProduct, setUuidProduct] = useState<string>('');
 	const [uuidQuality, setUuidQuality] = useState<string>('');
-	const [userOwnerUuid, setUserOwnerUuid] = useState<string>('');
-	const [userPartnerUuid, setUserPartnerUuid] = useState<string>('');
+	const [userOwnerUuid, setUserOwnerUuid] = useState<string[]>([]);
+	const [userPartnerUuid, setUserPartnerUuid] = useState<string[]>([]);
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
 	const [uuidStorage, setUuidStorage] = useState<string>('');
 	const [uuidSpec, setUuidSpec] = useState<string>('');
 	const [uuidCriteria, setUuidCriteria] = useState<string>('');
 	const [listCompanyUuid, setListCompanyUuid] = useState<any[]>([]);
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
-	const [provinceUuid, setProvinceUuid] = useState<string>('');
+	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
 		queryFn: () =>
@@ -92,10 +92,11 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					isPaging: CONFIG_PAGING.NO_PAGING,
-					userUuid: userPartnerUuid,
+					userUuid: '',
 					provinceId: '',
 					type: TYPE_PARTNER.NCC,
 					listCompanyUuid: listCompanyUuid,
+					listUserUuid: userPartnerUuid,
 				}),
 			}),
 		select(data) {
@@ -115,13 +116,14 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					partnerUUid: '',
-					userUuid: userOwnerUuid,
+					userUuid: '',
 					status: null,
 					typeCus: null,
 					provinceId: '',
 					specUuid: '',
 					listPartnerUUid: listPartnerUuid,
 					listCompanyUuid: listCompanyUuid,
+					listUserUuid: userOwnerUuid,
 				}),
 			}),
 		select(data) {
@@ -530,14 +532,14 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						}))}
 						name='Kv cảng xuất khẩu'
 					/>
-					<SelectFilterState
-						uuid={userPartnerUuid}
-						setUuid={setUserPartnerUuid}
+					<SelectFilterMany
+						selectedIds={userPartnerUuid}
+						setSelectedIds={setUserPartnerUuid}
 						listData={listUserPurchasing?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý nhập hàng'
+						name='Tất cả quản lý nhập hàng'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -548,14 +550,14 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						}))}
 						name='Công ty'
 					/>
-					<SelectFilterState
-						uuid={userOwnerUuid}
-						setUuid={setUserOwnerUuid}
+					<SelectFilterMany
+						selectedIds={userOwnerUuid}
+						setSelectedIds={setUserOwnerUuid}
 						listData={listUserMarket?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý nhân viên thị trường'
+						name='Tất cả quản lý nhân viên thị trường'
 					/>
 					<SelectFilterMany
 						selectedIds={customerUuid}
@@ -567,14 +569,14 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						name='Nhà cung cấp'
 					/>
 
-					<SelectFilterState
-						uuid={provinceUuid}
-						setUuid={setProvinceUuid}
+					<SelectFilterMany
+						selectedIds={provinceUuid}
+						setSelectedIds={setProvinceUuid}
 						listData={listProvince?.data?.map((v: any) => ({
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả tỉnh thành'
+						name='Tất cả tỉnh thành'
 					/>
 					<SelectFilterState
 						isShowAll={false}
