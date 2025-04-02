@@ -12,7 +12,7 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 
 	const checkForHorizontalScroll = () => {
 		const element = tableContainerRef.current;
-		if (element.scrollWidth > element.clientWidth) {
+		if (element?.scrollWidth > element?.clientWidth) {
 			setIsShowScroll(true);
 		} else {
 			setIsShowScroll(false);
