@@ -19,6 +19,7 @@ import {
 	TYPE_CUSTOMER,
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
+	TYPE_PARTNER,
 	TYPE_SHOW_BDMT,
 	TYPE_TRANSPORT,
 } from '~/constants/config/enum';
@@ -37,14 +38,15 @@ import commonServices from '~/services/commonServices';
 import SelectFilterMany from '../SelectFilterMany';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import SelectFilterState from '~/components/common/SelectFilterState';
+import partnerServices from '~/services/partnerServices';
 
 function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isShowBDMT, setIsShowBDMT] = useState<string>(String(TYPE_SHOW_BDMT.MT));
 	const [isProductSpec, setIsProductSpec] = useState<string>('1');
 	const [isTransport, setIsTransport] = useState<string>('');
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
-	const [provinceUuid, setProvinceUuid] = useState<string>('');
-	const [userUuid, setUserUuid] = useState<string>('');
+	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
+	const [userUuid, setUserUuid] = useState<string[]>([]);
 	const [storageUuid, setStorageUuid] = useState<string>('');
 	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.LAST_7_DAYS);
 	const [uuidCompany, setUuidCompanyFilter] = useState<string[]>([]);
@@ -55,7 +57,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 	const [dataChartMT, setDataChartMT] = useState<any[]>([]);
 	const [dataChartBDMT, setDataChartBDMT] = useState<any[]>([]);
-	const [userPartnerUuid, setUserPartnerUuid] = useState<string>('');
+	const [userPartnerUuid, setUserPartnerUuid] = useState<string[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [dataTotal, setDataTotal] = useState<{
 		totalWeight: number;
@@ -74,8 +76,9 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		totalWeight: 0,
 		lstProductTotal: [],
 	});
+	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
 
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, userUuid], {
+	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, listPartnerUuid, userUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -87,12 +90,14 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					partnerUUid: '',
-					userUuid: userUuid,
+					userUuid: '',
 					status: STATUS_CUSTOMER.HOP_TAC,
 					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
 					provinceId: '',
 					specUuid: '',
 					listCompanyUuid: uuidCompany,
+					listPartnerUUid: listPartnerUuid,
+					listUserUuid: userUuid,
 				}),
 			}),
 		select(data) {
@@ -220,6 +225,30 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		enabled: listRegency.isSuccess,
 	});
 
+	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany, userPartnerUuid], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: partnerServices.listPartner({
+					pageSize: 50,
+					page: 1,
+					keyword: '',
+					status: CONFIG_STATUS.HOAT_DONG,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					userUuid: '',
+					provinceId: '',
+					type: TYPE_PARTNER.NCC,
+					listCompanyUuid: uuidCompany,
+					listUserUuid: userPartnerUuid,
+				}),
+			}),
+		select(data) {
+			return data;
+		},
+	});
+
 	useQuery(
 		[
 			QUERY_KEY.thong_ke_tong_hang_nhap,
@@ -232,6 +261,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			provinceUuid,
 			isTransport,
 			userPartnerUuid,
+			listPartnerUuid,
 		],
 		{
 			queryFn: () =>
@@ -252,7 +282,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						provinceId: provinceUuid,
 						transportType: isTransport ? Number(isTransport) : null,
 						listCompanyUuid: uuidCompany,
-						listPartnerUuid: [],
+						listPartnerUuid: listPartnerUuid,
 					}),
 				}),
 			onSuccess({data}) {
@@ -345,13 +375,28 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		if (uuidCompany) {
 			setCustomerUuid([]);
 		}
-	}, [uuidCompany]);
+		if (listPartnerUuid) {
+			setCustomerUuid([]);
+		}
+	}, [uuidCompany, listPartnerUuid]);
 
 	useEffect(() => {
 		if (userUuid) {
 			setCustomerUuid([]);
 		}
 	}, [userUuid]);
+
+	useEffect(() => {
+		if (userPartnerUuid) {
+			setListPartnerUuid([]);
+		}
+	}, [userPartnerUuid]);
+
+	const currentData = isShowBDMT === String(TYPE_SHOW_BDMT.MT) ? dataChartMT : dataChartBDMT;
+
+	const drynessValues = currentData.flatMap((item) => productTypes.map((v) => item[`${v.key}_drynessAvg`] || 50));
+	const minDryness = Math.min(...drynessValues) - 1;
+	const maxDryness = Math.max(...drynessValues) + 1;
 
 	return (
 		<div className={styles.container}>
@@ -393,31 +438,32 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Tất cả kv cảng xuất khẩu'
 					/>
-					{/* <SelectFilterOption
-						uuid={customerUuid}
-						setUuid={setCustomerUuid}
-						listData={listCustomer?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Tất cả nhà cung cấp'
-					/> */}
-					<SelectFilterState
-						uuid={userPartnerUuid}
-						setUuid={setUserPartnerUuid}
+
+					<SelectFilterMany
+						selectedIds={userPartnerUuid}
+						setSelectedIds={setUserPartnerUuid}
 						listData={listUserPurchasing?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
 						placeholder='Tất cả quản lý nhập hàng'
 					/>
+					<SelectFilterMany
+						selectedIds={listPartnerUuid}
+						setSelectedIds={setListPartnerUuid}
+						listData={listPartner?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Công ty'
+					/>
 					<CheckRegencyCode
 						isPage={false}
 						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
 					>
-						<SelectFilterOption
-							uuid={userUuid}
-							setUuid={setUserUuid}
+						<SelectFilterMany
+							selectedIds={userUuid}
+							setSelectedIds={setUserUuid}
 							listData={listUserMarket?.data?.map((v: any) => ({
 								uuid: v?.uuid,
 								name: v?.fullName,
@@ -477,9 +523,9 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						]}
 						placeholder='Tất cả vận chuyển'
 					/>
-					<SelectFilterOption
-						uuid={provinceUuid}
-						setUuid={setProvinceUuid}
+					<SelectFilterMany
+						selectedIds={provinceUuid}
+						setSelectedIds={setProvinceUuid}
 						listData={listProvince?.data?.map((v: any) => ({
 							uuid: v?.matp,
 							name: v?.name,
@@ -530,7 +576,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 						<YAxis domain={[0, 4000000]} tickFormatter={(value): any => convertWeight(value)} />
 
-						<YAxis yAxisId='right' domain={[25, 75]} orientation='right' tickFormatter={(v) => `${v}%`} />
+						<YAxis yAxisId='right' domain={[minDryness, maxDryness]} orientation='right' tickFormatter={(v) => `${v}%`} />
 
 						<Tooltip
 							formatter={(value, name, props): any => {
