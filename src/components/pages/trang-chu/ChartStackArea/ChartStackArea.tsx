@@ -564,8 +564,8 @@ function ChartStackArea({}: PropsChartStackArea) {
 						<XAxis dataKey='name' scale='point' padding={{left: 40}} />
 						<YAxis
 							domain={[
-								dataBoardDailyPrice?.data?.data?.priceMin - 500000,
-								dataBoardDailyPrice?.data?.data?.priceMax + 500000,
+								dataBoardDailyPrice?.data?.data?.priceMin - 100000,
+								dataBoardDailyPrice?.data?.data?.priceMax + 100000,
 							]}
 							tickFormatter={(value) => convertCoin(value)}
 						/>
