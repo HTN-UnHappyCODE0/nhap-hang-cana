@@ -381,6 +381,12 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 	}, [uuidCompany, listPartnerUuid]);
 
 	useEffect(() => {
+		if (uuidCompany) {
+			setListPartnerUuid([]);
+		}
+	}, [uuidCompany]);
+
+	useEffect(() => {
 		if (userUuid) {
 			setCustomerUuid([]);
 		}

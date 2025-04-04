@@ -6,7 +6,6 @@ import ImageFill from '../ImageFill';
 import icons from '~/constants/images/icons';
 import {MAXIMUM_FILE} from '~/constants/config';
 import {toastError, toastWarn} from '~/common/funcs/toast';
-import {log} from 'console';
 
 function AvatarChange({path, name, onSetFile}: PropsAvatarChange) {
 	const [imageBase64, setImageBase64] = useState<string>('');

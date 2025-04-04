@@ -20,8 +20,6 @@ function PopupConfirmDryness({dataBillChangeDryness, onClose}: PropsPopupConfirm
 		description: '',
 	});
 
-	console.log({dataBillChangeDryness});
-
 	const funcRemoveFixDryness = useMutation({
 		mutationFn: (body: {uuids: string[]; description: string}) =>
 			httpRequest({
