@@ -6,8 +6,6 @@ export default function convertPositonStorage(numberId: number, weight: number):
 
 	const quantity = Math.ceil((weight / (WEIGHT_WAREHOUSE * 100)) * 100);
 
-	console.log({numberId, quantity});
-
 	// Hàm lấy hàng và cột từ id
 	function getRowCol(id: number) {
 		const row = Math.floor((id - 1) / gridSize);

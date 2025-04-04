@@ -1,49 +1,47 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
-import {PropsMainPageStatisticsByDay} from './interfaces';
-import styles from './MainPageStatisticsByDay.module.scss';
-import DataWrapper from '~/components/common/DataWrapper';
+import {PropsChartStackStatisticsByDay} from './interfaces';
+import styles from './ChartStackStatisticsByDay.module.scss';
+import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
+import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
+import SelectFilterOption from '../SelectFilterOption';
+import {useQuery} from '@tanstack/react-query';
 import {
 	CONFIG_DESCENDING,
 	CONFIG_PAGING,
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
+	REGENCY_CODE,
 	REGENCY_NAME,
+	STATUS_CUSTOMER,
+	TYPE_CUSTOMER,
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
 	TYPE_PARTNER,
 	TYPE_PRODUCT,
 } from '~/constants/config/enum';
-import {useQuery} from '@tanstack/react-query';
 import {httpRequest} from '~/services';
 import customerServices from '~/services/customerServices';
-import {useRouter} from 'next/router';
-import Table from '~/components/common/Table';
-import Noti from '~/components/common/DataWrapper/components/Noti';
-import {convertWeight} from '~/common/funcs/optionConvert';
-
-import Link from 'next/link';
-import batchBillServices from '~/services/batchBillServices';
-import companyServices from '~/services/companyServices';
-import SelectFilterMany from '~/components/common/SelectFilterMany';
-import partnerServices from '~/services/partnerServices';
-import storageServices from '~/services/storageServices';
-import DateRangerCustom from '~/components/common/DateRangerCustom';
-import moment from 'moment';
-import Search from '~/components/common/Search';
-import commonServices from '~/services/commonServices';
-import SelectFilterState from '~/components/common/SelectFilterState';
-import wareServices from '~/services/wareServices';
-import Loading from '~/components/common/Loading';
-import regencyServices from '~/services/regencyServices';
 import userServices from '~/services/userServices';
-import Pagination from '~/components/common/Pagination';
+import regencyServices from '~/services/regencyServices';
+import priceTagServices from '~/services/priceTagServices';
+import SelectFilterDate from '../SelectFilterDate';
+import {timeSubmit} from '~/common/funcs/optionConvert';
+import companyServices from '~/services/companyServices';
+import moment from 'moment';
+import {convertCoin} from '~/common/funcs/convertCoin';
+import wareServices from '~/services/wareServices';
+import commonServices from '~/services/commonServices';
+import SelectFilterMany from '../SelectFilterMany';
+import partnerServices from '~/services/partnerServices';
+import batchBillServices from '~/services/batchBillServices';
+import criteriaServices from '~/services/criteriaServices';
+import storageServices from '~/services/storageServices';
+import {useRouter} from 'next/router';
 
-function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
+function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	const router = useRouter();
-
-	const {_partnerUuid, _dateFrom, _dateTo} = router.query;
 
 	const [listStatisticsByDay, setListStatisticsByDay] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -55,9 +53,17 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
 	const [uuidStorage, setUuidStorage] = useState<string>('');
 	const [uuidSpec, setUuidSpec] = useState<string>('');
+	const [uuidCriteria, setUuidCriteria] = useState<string>('');
 	const [listCompanyUuid, setListCompanyUuid] = useState<any[]>([]);
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
 	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
+	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.THIS_YEAR);
+	const [date, setDate] = useState<{
+		from: Date | null;
+		to: Date | null;
+	} | null>(null);
+	const [productTypes, setProductTypes] = useState<any[]>([]);
+	const [dataChart, setDataChart] = useState<any[]>([]);
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
 		queryFn: () =>
@@ -169,6 +175,11 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					type: [TYPE_PRODUCT.CONG_TY],
 				}),
 			}),
+		onSuccess(data) {
+			if (data) {
+				setUuidProduct(data[0]?.uuid);
+			}
+		},
 		select(data) {
 			return data;
 		},
@@ -188,6 +199,11 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					status: CONFIG_STATUS.HOAT_DONG,
 				}),
 			}),
+		onSuccess(data) {
+			if (data) {
+				setUuidQuality(data[0]?.uuid);
+			}
+		},
 		select(data) {
 			return data;
 		},
@@ -223,6 +239,11 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					productTypeUuid: uuidProduct,
 				}),
 			}),
+		// onSuccess(data) {
+		// 	if (data) {
+		// 		setUuidSpec(data[0]?.uuid);
+		// 	}
+		// },
 		select(data) {
 			return data;
 		},
@@ -292,16 +313,143 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		enabled: listRegency.isSuccess,
 	});
 
-	const formatTimeScale = (timeScale: string, typeShow: number) => {
-		if (typeShow === TYPE_DATE_SHOW.HOUR) {
-			return moment(timeScale).format('HH:mm');
-		} else if (typeShow === TYPE_DATE_SHOW.DAY) {
-			return moment(timeScale).format('DD/MM');
-		} else if (typeShow === TYPE_DATE_SHOW.MONTH) {
-			return moment(timeScale).format('MM-YYYY');
+	const listCriteria = useQuery([QUERY_KEY.dropdown_tieu_chi_quy_cach, uuidSpec, uuidQuality], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: criteriaServices.listCriteriaSpec({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					status: CONFIG_STATUS.HOAT_DONG,
+					specificationUuid: uuidSpec,
+					qualityUuid: uuidQuality,
+				}),
+			}),
+		onSuccess(data) {
+			if (data) {
+				setUuidCriteria(data[0]?.uuid);
+			}
+		},
+		select(data) {
+			return data;
+		},
+	});
+
+	const dataBoardStatistics = useQuery(
+		[
+			QUERY_KEY.thong_ke_bieu_do_chat_luong,
+			userOwnerUuid,
+			uuidCompany,
+			customerUuid,
+			uuidStorage,
+			listCompanyUuid,
+			listPartnerUuid,
+			provinceUuid,
+			uuidSpec,
+			uuidProduct,
+			uuidQuality,
+			userPartnerUuid,
+			uuidCriteria,
+			date,
+		],
+		{
+			queryFn: () =>
+				httpRequest({
+					isData: true,
+					http: batchBillServices.dashbroadSpecBillIn({
+						companyUuid: uuidCompany,
+						customerUuid: customerUuid,
+						isShowBDMT: 0,
+						partnerUuid: '',
+						provinceId: provinceUuid,
+						storageUuid: uuidStorage,
+						timeStart: timeSubmit(date?.from)!,
+						timeEnd: timeSubmit(date?.to, true)!,
+						transportType: null,
+						typeFindDay: 0,
+						typeShow: 0,
+						userOwnerUuid: userOwnerUuid,
+						userPartnerUuid: userPartnerUuid,
+						warehouseUuid: '',
+						listCompanyUuid: listCompanyUuid,
+						listPartnerUuid: listPartnerUuid,
+						specificationUuid: uuidSpec,
+						productTypeUuid: uuidProduct,
+						qualityUuid: uuidQuality,
+						criterialUuid: uuidCriteria,
+					}),
+				}),
+			onSuccess({data}) {
+				// Convert data chart
+				const dataConvert = data?.lstInfoDaily?.map((v: any) => {
+					const date =
+						data?.typeShow == TYPE_DATE_SHOW.HOUR
+							? moment(v?.timeScale).format('HH:mm')
+							: data?.typeShow == TYPE_DATE_SHOW.DAY
+							? moment(v?.timeScale).format('DD/MM')
+							: data?.typeShow == TYPE_DATE_SHOW.MONTH
+							? moment(v?.timeScale).format('MM-YYYY')
+							: moment(v?.timeScale).format('YYYY');
+
+					const objTotal = {
+						'Trung bình': v?.percentAvg || 0,
+					};
+
+					const obj = v?.customerDateWeightUu?.reduce(
+						(acc: any, {customerUu, percentAvg}: {customerUu: any; percentAvg: number}) => {
+							acc[customerUu?.name] = percentAvg;
+							return acc;
+						},
+						{}
+					);
+
+					return {
+						name: date,
+						...objTotal,
+						...obj,
+					};
+				});
+
+				const productColors = data?.lstInfoDaily
+					?.flatMap((v: any) => {
+						const colors = ['#2CAE39', '#8A2BE2', '#FF4500', '#32CD32', '#FFD700', '#00CED1', '#FF1493'];
+						let colorIndex = 0;
+
+						return [
+							{
+								key: 'Trung bình',
+								fill: '#FF6838',
+							},
+
+							...v?.customerDateWeightUu.map((v: any) => ({
+								key: v?.customerUu.name,
+								fill: colors[colorIndex++ % colors.length],
+							})),
+						];
+					})
+					.reduce((acc: any, {key, fill}: {key: string; fill: string}) => {
+						if (key && !acc[key]) {
+							acc[key] = fill;
+						}
+						return acc;
+					}, {});
+
+				const productTypes = productColors
+					? Object.entries(productColors).map(([key, fill]) => ({
+							key,
+							fill,
+					  }))
+					: [];
+
+				setProductTypes(productTypes);
+				setDataChart(dataConvert);
+			},
 		}
-		return moment(timeScale).format('YYYY');
-	};
+	);
 
 	useEffect(() => {
 		if (listCompanyUuid) {
@@ -320,12 +468,21 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 
 	useEffect(() => {
 		if (uuidProduct) {
-			setUuidSpec('');
+			setUuidSpec(listSpecifications?.data?.[0]?.uuid || '');
 		}
 		if (uuidQuality) {
-			setUuidSpec('');
+			setUuidSpec(listSpecifications?.data?.[0]?.uuid || '');
 		}
 	}, [uuidProduct, uuidQuality]);
+
+	useEffect(() => {
+		if (uuidSpec) {
+			setUuidCriteria(listCriteria?.data?.[0]?.uuid || '');
+		}
+		if (uuidQuality) {
+			setUuidCriteria(listCriteria?.data?.[0]?.uuid || '');
+		}
+	}, [uuidSpec, uuidQuality]);
 
 	useEffect(() => {
 		if (userPartnerUuid) {
@@ -339,139 +496,11 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		}
 	}, [userOwnerUuid]);
 
-	const convertData = (data: any) => {
-		return data?.lstProductDay?.reduce((acc: any, item: any) => {
-			item?.customerDateWeightUu?.forEach((entry: any) => {
-				const existingCustomer = acc.find((customer: any) => customer.customerUu?.uuid === entry.customerUu?.uuid);
-
-				const timeEntry = {
-					timeScale: formatTimeScale(item?.timeScale, data?.typeShow),
-					weightMT: entry?.weightMT,
-					weightBDMT: entry?.weightBDMT,
-					drynessAvg: entry?.drynessAvg,
-					weightBDMTAvg: entry?.weightBDMTAvg,
-				};
-
-				const totalInfo = data?.lstProductTotal?.find((total: any) => total?.customerUu?.uuid === entry?.customerUu?.uuid);
-
-				if (existingCustomer) {
-					existingCustomer.timeList.push(timeEntry);
-				} else {
-					acc.push({
-						customerUu: entry?.customerUu,
-						timeList: [timeEntry],
-						weightMT: totalInfo?.weightMT || 0,
-						weightBDMT: totalInfo?.weightBDMT || 0,
-						drynessAvg: totalInfo?.drynessAvg || 0,
-						weightBDMTAvg: totalInfo?.weightBDMTAvg || 0,
-					});
-				}
-			});
-			return acc;
-		}, []);
-	};
-
-	const getListDashbroadCustomerBillIn = useQuery(
-		[
-			QUERY_KEY.table_thong_ke_theo_ngay,
-			userOwnerUuid,
-			uuidCompany,
-			customerUuid,
-			_partnerUuid,
-			uuidStorage,
-			_dateFrom,
-			_dateTo,
-			listCompanyUuid,
-			listPartnerUuid,
-			provinceUuid,
-			uuidSpec,
-			uuidProduct,
-			uuidQuality,
-			userPartnerUuid,
-		],
-		{
-			queryFn: () =>
-				httpRequest({
-					isList: true,
-					setLoading: setLoading,
-					http: batchBillServices.dashbroadCustomerBillIn({
-						companyUuid: uuidCompany,
-						customerUuid: customerUuid,
-						isShowBDMT: 0,
-						partnerUuid: '',
-						provinceId: provinceUuid,
-						storageUuid: uuidStorage,
-						timeStart: _dateFrom ? (_dateFrom as string) : null,
-						timeEnd: _dateTo ? (_dateTo as string) : null,
-						transportType: null,
-						typeFindDay: 0,
-						typeShow: 0,
-						userOwnerUuid: userOwnerUuid,
-						userPartnerUuid: userPartnerUuid,
-						warehouseUuid: '',
-						listCompanyUuid: listCompanyUuid,
-						listPartnerUuid: listPartnerUuid,
-						specificationUuid: uuidSpec,
-						productTypeUuid: uuidProduct,
-						qualityUuid: uuidQuality,
-					}),
-				}),
-			onSuccess(data) {
-				if (data) {
-					const newData = convertData(data);
-					setListStatisticsByDay(newData);
-					// setTotal(data?.pagination?.totalCount);
-					// console.log('acb', data)
-				}
-			},
-			select(data) {
-				if (data) {
-					return data;
-				}
-			},
-		}
-	);
-
-	// useEffect(() => {
-	// 	if(getListDashbroadCustomerBillIn){
-	// 		setListStatisticsByDay(convertData(getListDashbroadCustomerBillIn?.data || []));}
-	// }, [getListDashbroadCustomerBillIn]);
-
-	const dynamicColumns =
-		listStatisticsByDay?.[0]?.timeList?.map((item: any) => ({
-			title: (
-				<span className={styles.unit}>
-					{item?.timeScale} <br /> (Tấn/%)
-				</span>
-			),
-			render: (data: any) => {
-				const matchedTime = data?.timeList?.find((t: any) => t?.timeScale === item?.timeScale);
-				return (
-					<span>
-						<p>{convertWeight(matchedTime?.weightBDMT)}</p>{' '}
-						<p style={{color: '#2367ed'}}>{matchedTime?.drynessAvg!?.toFixed(2) || '---'} %</p>
-					</span>
-				);
-			},
-		})) || [];
-
-	useEffect(() => {
-		if (listCompanyUuid) {
-			setCustomerUuid([]);
-		}
-		if (listPartnerUuid) {
-			setCustomerUuid([]);
-		}
-	}, [listCompanyUuid, listPartnerUuid]);
-
 	return (
 		<div className={styles.container}>
-			{/* <Loading loading={getListDashbroadCustomerBillIn.isLoading} /> */}
-			<div className={styles.header}>
-				<div className={styles.main_search}>
-					{/* <div className={styles.search}>
-						<Search keyName='_keyword' placeholder='Tìm kiếm ...' />
-					</div> */}
+			<div className={styles.head}>
+				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
+				<div className={styles.filter}>
 					<SelectFilterMany
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
@@ -479,7 +508,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Kv cảng xuất khẩu'
+						placeholder='Kv cảng xuất khẩu'
 					/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -488,7 +517,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhập hàng'
+						placeholder='Tất cả quản lý nhập hàng'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -497,7 +526,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Công ty'
+						placeholder='Công ty'
 					/>
 					<SelectFilterMany
 						selectedIds={userOwnerUuid}
@@ -506,7 +535,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhân viên thị trường'
+						placeholder='Tất cả quản lý nhân viên thị trường'
 					/>
 					<SelectFilterMany
 						selectedIds={customerUuid}
@@ -515,7 +544,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						placeholder='Nhà cung cấp'
 					/>
 
 					<SelectFilterMany
@@ -525,19 +554,21 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						name='Tỉnh thành'
+						placeholder='Tất cả tỉnh thành'
 					/>
-					<SelectFilterState
+					<SelectFilterOption
+						isShowAll={false}
 						uuid={uuidProduct}
 						setUuid={setUuidProduct}
 						listData={listProductType?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Loại hàng'
+						placeholder='Tất cả loại hàng'
 					/>
 
-					<SelectFilterState
+					<SelectFilterOption
+						isShowAll={false}
 						uuid={uuidQuality}
 						setUuid={setUuidQuality}
 						listData={listQuality?.data?.map((v: any) => ({
@@ -546,105 +577,109 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						}))}
 						placeholder='Quốc gia'
 					/>
-					<SelectFilterState
+					<SelectFilterOption
 						uuid={uuidSpec}
 						setUuid={setUuidSpec}
 						listData={listSpecifications?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Quy cách'
+						placeholder='Tất cả quy cách'
+					/>
+					<SelectFilterOption
+						isShowAll={false}
+						uuid={uuidCriteria}
+						setUuid={setUuidCriteria}
+						listData={listCriteria?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.title,
+						}))}
+						placeholder='Tất cả tiêu chí'
 					/>
 
 					<div className={styles.filter}>
-						<DateRangerCustom
-							titleTime='Thời gian'
-							typeDateDefault={TYPE_DATE.LAST_7_DAYS}
-							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
+						<SelectFilterDate
+							isOptionDateAll={false}
+							date={date}
+							setDate={setDate}
+							typeDate={typeDate}
+							setTypeDate={setTypeDate}
 						/>
 					</div>
 				</div>
 			</div>
-			<div className={styles.table}>
-				<DataWrapper
-					data={listStatisticsByDay || []}
-					loading={loading}
-					noti={<Noti des='Hiện tại chưa có danh sách thống kê theo ngày nào!' disableButton />}
-				>
-					<Table
-						data={listStatisticsByDay || []}
-						onSetData={setListStatisticsByDay}
-						column={[
-							{
-								title: 'STT',
-								fixedLeft: true,
-								render: (data: any, index: number) => <>{index + 1}</>,
-							},
-							{
-								title: 'Nhà cung cấp',
-								fixedLeft: true,
-								render: (data: any) => (
-									<p className={styles.name}>
-										<Link href={`/xuong/${data?.customerUu?.uuid}`} className={styles.link}>
-											{data?.customerUu?.name || '---'}
-										</Link>
-									</p>
-								),
-							},
+			<div className={styles.head_data}>
+				<p className={styles.data_total}>
+					<div className={styles.wrapper}>
+						<div className={styles.line} style={{background: '#2A85FF'}}></div>
+						<div className={styles.circle} style={{borderColor: '#2A85FF'}}></div>
+					</div>
+					<div>
+						Lớn nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMax)} (VNĐ)</span>
+					</div>
+				</p>
+				<p className={styles.data_total}>
+					<div className={styles.wrapper}>
+						<div className={styles.line} style={{background: '#FF6838'}}></div>
+						<div className={styles.circle} style={{borderColor: '#FF6838'}}></div>
+					</div>
+					<div>
+						Trung bình:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceAvg)} (VNĐ)</span>
+					</div>
+				</p>
+				<p className={styles.data_total}>
+					<div className={styles.wrapper}>
+						<div className={styles.line} style={{background: '#2DA2BC'}}></div>
+						<div className={styles.circle} style={{borderColor: '#2DA2BC'}}></div>
+					</div>
+					<div>
+						Nhỏ nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMin)} (VNĐ)</span>
+					</div>
+				</p>
+				{/* <p className={styles.data_total}>
+					<div className={styles.wrapper}>
+						<div className={styles.line} style={{background: '#2CAE39'}}></div>
+						<div className={styles.circle} style={{borderColor: '#2CAE39'}}></div>
+					</div>
+					<div>
+						Khách hàng:<span>{convertCoin(dataBoardStatistics
+						?.data?.data?.overview?.customerLine)} (VNĐ)</span>
+					</div>
+				</p> */}
+			</div>
+			<div className={styles.main_chart}>
+				<ResponsiveContainer width='100%' height='100%'>
+					<AreaChart
+						width={500}
+						height={300}
+						data={dataChart}
+						margin={{
+							top: 8,
+							right: 8,
+							left: 24,
+							bottom: 8,
+						}}
+					>
+						<CartesianGrid strokeDasharray='3 3' />
+						<XAxis dataKey='name' scale='point' padding={{left: 40}} />
+						<YAxis domain={[20, 100]} tickFormatter={(value) => convertCoin(value)} />
+						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
-							{
-								title: (
-									<span className={styles.unit}>
-										Sản lượng TB <br />
-										(Tấn)
-									</span>
-								),
-								fixedLeft: true,
-								render: (data: any) => <>{convertWeight(data?.weightBDMTAvg)}</>,
-							},
-							{
-								title: (
-									<span className={styles.unit}>
-										Độ khô TB <br />
-										(%)
-									</span>
-								),
-								fixedLeft: true,
-								render: (data: any) => <p style={{color: '#2367ed'}}>{data?.drynessAvg!?.toFixed(2)} %</p>,
-							},
-							{
-								title: (
-									<span className={styles.unit}>
-										Tổng lượng <br />
-										(Tấn)
-									</span>
-								),
-								render: (data: any) => <>{convertWeight(data?.weightBDMT)}</>,
-							},
-							// {
-							// 	groupTitle: 'Thông tin sản xuất', // ✅ Tiêu đề nhóm
-							// 	children: [
-							// 		{
-							// 			title: 'Xưởng sản xuất',
-							// 			fixedLeft: true,
-							// 			render: (data: any) => <p className={styles.link}>{data?.customerUu?.name}</p>,
-							// 		},
-							// 		{
-							// 			title: 'Sản lượng trung bình (Tấn)',
-							// 			render: (data: any) => <>{convertWeight(data?.abc)}</>,
-							// 		},
-							// 	],
-							// },
-
-							...dynamicColumns,
-						]}
-					/>
-				</DataWrapper>
-
-				{/* {!queryWeightsession.isFetching && ( */}
+						{productTypes.map((v) => (
+							<Area
+								key={v.key}
+								type='linear'
+								dataKey={v.key}
+								stroke={v.fill}
+								fill='none'
+								dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
+							/>
+						))}
+					</AreaChart>
+				</ResponsiveContainer>
 			</div>
 		</div>
 	);
 }
 
-export default MainPageStatisticsByDay;
+export default ChartStackStatisticsByDay;
