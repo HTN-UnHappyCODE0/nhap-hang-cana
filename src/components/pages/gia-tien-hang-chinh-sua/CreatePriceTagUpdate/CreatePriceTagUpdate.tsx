@@ -248,7 +248,6 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 
 		return funcFixPricetag.mutate();
 	};
-	console.log({form});
 
 	return (
 		<div className={styles.container}>

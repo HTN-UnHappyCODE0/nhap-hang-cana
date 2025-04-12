@@ -59,7 +59,12 @@ export enum PATH {
 
 	// Thống kê sản lượng
 	ThongKeSanLuong = '/thong-ke-san-luong',
+
+	// Thống kê chất lượng
 	ThongKeChatLuong = '/thong-ke-chat-luong',
+
+	// Thống kê chất lượng theo quy cách
+	ThongKeChatLuongTheoQuyCach = '/thong-ke-chat-luong-theo-quy-cach',
 }
 
 export const Menu: {
@@ -184,6 +189,17 @@ export const Menu: {
 				title: 'Thống kê chất lượng',
 				icon: icons.thongkechatluong,
 				path: PATH.ThongKeChatLuong,
+				regencys: [
+					REGENCY_CODE.GIAM_DOC,
+					REGENCY_CODE.PHO_GIAM_DOC,
+					REGENCY_CODE.QUAN_LY_NHAP_HANG,
+					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
+				],
+			},
+			{
+				title: 'Thống kê chất lượng theo quy cách',
+				icon: icons.thongketheoquycach,
+				path: PATH.ThongKeChatLuongTheoQuyCach,
 				regencys: [
 					REGENCY_CODE.GIAM_DOC,
 					REGENCY_CODE.PHO_GIAM_DOC,

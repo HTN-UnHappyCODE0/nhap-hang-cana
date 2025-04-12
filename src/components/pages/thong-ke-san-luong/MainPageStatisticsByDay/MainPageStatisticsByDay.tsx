@@ -455,6 +455,8 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 			},
 		})) || [];
 
+	console.log('listStatisticsByDay', listStatisticsByDay);
+
 	useEffect(() => {
 		if (listCompanyUuid) {
 			setCustomerUuid([]);

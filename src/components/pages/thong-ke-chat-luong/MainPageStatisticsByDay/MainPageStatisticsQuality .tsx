@@ -472,8 +472,6 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 				if (data) {
 					const newData = convertData(data);
 					setListStatisticsByDay(newData);
-					// setTotal(data?.pagination?.totalCount);
-					// console.log('acb', data)
 				}
 			},
 			select(data) {
@@ -483,11 +481,6 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 			},
 		}
 	);
-
-	// useEffect(() => {
-	// 	if(getListDashbroadCustomerBillIn){
-	// 		setListStatisticsByDay(convertData(getListDashbroadCustomerBillIn?.data || []));}
-	// }, [getListDashbroadCustomerBillIn]);
 
 	const dynamicColumns =
 		listStatisticsByDay?.[0]?.timeList?.map((item: any) => ({
@@ -666,27 +659,10 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 								render: (data: any) => <>{data?.percentAvg!?.toFixed(2)} %</>,
 							},
 
-							// {
-							// 	groupTitle: 'Thông tin sản xuất', // ✅ Tiêu đề nhóm
-							// 	children: [
-							// 		{
-							// 			title: 'Xưởng sản xuất',
-							// 			fixedLeft: true,
-							// 			render: (data: any) => <p className={styles.link}>{data?.customerUu?.name}</p>,
-							// 		},
-							// 		{
-							// 			title: 'Sản lượng trung bình (Tấn)',
-							// 			render: (data: any) => <>{convertWeight(data?.abc)}</>,
-							// 		},
-							// 	],
-							// },
-
 							...dynamicColumns,
 						]}
 					/>
 				</DataWrapper>
-
-				{/* {!queryWeightsession.isFetching && ( */}
 			</div>
 		</div>
 	);
