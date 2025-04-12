@@ -11,7 +11,7 @@ function MainDashboard({}: PropsMainDashboard) {
 		<div className={styles.container}>
 			<ChartImportCompany />
 			<ChartStackArea />
-			{/* <ChartStackStatisticsByDay/> */}
+			<ChartStackStatisticsByDay />
 		</div>
 	);
 }

@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {PropsChartStackStatisticsByDay} from './interfaces';
 import styles from './ChartStackStatisticsByDay.module.scss';
-import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
+import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line} from 'recharts';
 import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
 import SelectFilterOption from '../SelectFilterOption';
 import {useQuery} from '@tanstack/react-query';
@@ -540,6 +540,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					<SelectFilterMany
 						selectedIds={customerUuid}
 						setSelectedIds={setCustomerUuid}
+						isShowAll={false}
 						listData={listCustomer?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
@@ -609,7 +610,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 				</div>
 			</div>
 			<div className={styles.head_data}>
-				<p className={styles.data_total}>
+				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2A85FF'}}></div>
 						<div className={styles.circle} style={{borderColor: '#2A85FF'}}></div>
@@ -617,17 +618,18 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					<div>
 						Lớn nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMax)} (VNĐ)</span>
 					</div>
-				</p>
+				</p> */}
 				<p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#FF6838'}}></div>
 						<div className={styles.circle} style={{borderColor: '#FF6838'}}></div>
 					</div>
 					<div>
-						Trung bình:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceAvg)} (VNĐ)</span>
+						Trung bình
+						{/* :<span>{convertCoin(dataBoardStatistics?.data?.data?.priceAvg)} (VNĐ)</span> */}
 					</div>
 				</p>
-				<p className={styles.data_total}>
+				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2DA2BC'}}></div>
 						<div className={styles.circle} style={{borderColor: '#2DA2BC'}}></div>
@@ -635,7 +637,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					<div>
 						Nhỏ nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMin)} (VNĐ)</span>
 					</div>
-				</p>
+				</p> */}
 				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2CAE39'}}></div>
@@ -662,18 +664,22 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					>
 						<CartesianGrid strokeDasharray='3 3' />
 						<XAxis dataKey='name' scale='point' padding={{left: 40}} />
-						<YAxis domain={[20, 100]} tickFormatter={(value) => convertCoin(value)} />
+						<YAxis domain={[0, 1]} tickFormatter={(value) => convertCoin(value)} />
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
 						{productTypes.map((v) => (
 							<Area
 								key={v.key}
-								type='linear'
+								type='basis'
 								dataKey={v.key}
 								stroke={v.fill}
 								fill='none'
 								dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
 							/>
+						))}
+
+						{productTypes.map((v, i) => (
+							<Line key={`line-${v.key}`} tooltipType='none' dataKey={v.key} stroke={v.fill} fill={v?.fill} />
 						))}
 					</AreaChart>
 				</ResponsiveContainer>
