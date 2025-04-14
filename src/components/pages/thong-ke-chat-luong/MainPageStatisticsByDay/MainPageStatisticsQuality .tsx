@@ -445,7 +445,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 				httpRequest({
 					isList: true,
 					setLoading: setLoading,
-					http: batchBillServices.dashbroadSpecBillIn({
+					http: batchBillServices.tableSpecBillIn({
 						companyUuid: uuidCompany,
 						customerUuid: customerUuid,
 						isShowBDMT: 0,

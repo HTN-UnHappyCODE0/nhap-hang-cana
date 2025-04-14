@@ -306,3 +306,10 @@ export enum TYPE_STORE {
 	ADMIN_KHO,
 	NHAP_HANG,
 }
+
+export enum TYPE_FILTE_TIME {
+	NGAY,
+	TUAN,
+	THANG,
+	NAM,
+}

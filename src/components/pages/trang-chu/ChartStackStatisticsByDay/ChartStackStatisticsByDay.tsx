@@ -2,9 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {PropsChartStackStatisticsByDay} from './interfaces';
 import styles from './ChartStackStatisticsByDay.module.scss';
-import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
-import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
-import SelectFilterOption from '../SelectFilterOption';
+import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, Scatter} from 'recharts';
 import {useQuery} from '@tanstack/react-query';
 import {
 	CONFIG_DESCENDING,
@@ -25,7 +23,6 @@ import {httpRequest} from '~/services';
 import customerServices from '~/services/customerServices';
 import userServices from '~/services/userServices';
 import regencyServices from '~/services/regencyServices';
-import priceTagServices from '~/services/priceTagServices';
 import SelectFilterDate from '../SelectFilterDate';
 import {timeSubmit} from '~/common/funcs/optionConvert';
 import companyServices from '~/services/companyServices';
@@ -33,12 +30,13 @@ import moment from 'moment';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import wareServices from '~/services/wareServices';
 import commonServices from '~/services/commonServices';
-import SelectFilterMany from '../SelectFilterMany';
 import partnerServices from '~/services/partnerServices';
 import batchBillServices from '~/services/batchBillServices';
 import criteriaServices from '~/services/criteriaServices';
 import storageServices from '~/services/storageServices';
 import {useRouter} from 'next/router';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import SelectFilterMany from '~/components/common/SelectFilterMany/SelectFilterMany';
 
 function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	const router = useRouter();
@@ -396,7 +394,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							: moment(v?.timeScale).format('YYYY');
 
 					const objTotal = {
-						'Trung bình': v?.percentAvg || 0,
+						'Trung bình': data?.percentAvg || 0,
 					};
 
 					const obj = v?.customerDateWeightUu?.reduce(
@@ -499,7 +497,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
-				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
+				<h3>Biểu đồ thống kê chất lượng</h3>
 				<div className={styles.filter}>
 					<SelectFilterMany
 						selectedIds={listCompanyUuid}
@@ -508,7 +506,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Kv cảng xuất khẩu'
+						name='Kv cảng xuất khẩu'
 					/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -517,7 +515,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý nhập hàng'
+						name='Quản lý nhập hàng'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -526,7 +524,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Công ty'
+						name='Công ty'
 					/>
 					<SelectFilterMany
 						selectedIds={userOwnerUuid}
@@ -535,16 +533,17 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý nhân viên thị trường'
+						name='Quản lý nhân viên thị trường'
 					/>
 					<SelectFilterMany
 						selectedIds={customerUuid}
 						setSelectedIds={setCustomerUuid}
+						isShowAll={false}
 						listData={listCustomer?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Nhà cung cấp'
+						name='Nhà cung cấp'
 					/>
 
 					<SelectFilterMany
@@ -554,9 +553,9 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả tỉnh thành'
+						name='Tỉnh thành'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={uuidProduct}
 						setUuid={setUuidProduct}
@@ -564,10 +563,10 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả loại hàng'
+						placeholder='Loại hàng'
 					/>
 
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={uuidQuality}
 						setUuid={setUuidQuality}
@@ -577,16 +576,16 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						}))}
 						placeholder='Quốc gia'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						uuid={uuidSpec}
 						setUuid={setUuidSpec}
 						listData={listSpecifications?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả quy cách'
+						placeholder='Quy cách'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={uuidCriteria}
 						setUuid={setUuidCriteria}
@@ -594,7 +593,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.title,
 						}))}
-						placeholder='Tất cả tiêu chí'
+						placeholder='Tiêu chí'
 					/>
 
 					<div className={styles.filter}>
@@ -609,7 +608,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 				</div>
 			</div>
 			<div className={styles.head_data}>
-				<p className={styles.data_total}>
+				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2A85FF'}}></div>
 						<div className={styles.circle} style={{borderColor: '#2A85FF'}}></div>
@@ -617,17 +616,18 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					<div>
 						Lớn nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMax)} (VNĐ)</span>
 					</div>
-				</p>
+				</p> */}
 				<p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#FF6838'}}></div>
 						<div className={styles.circle} style={{borderColor: '#FF6838'}}></div>
 					</div>
 					<div>
-						Trung bình:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceAvg)} (VNĐ)</span>
+						Trung bình
+						{/* :<span>{convertCoin(dataBoardStatistics?.data?.data?.priceAvg)} (VNĐ)</span> */}
 					</div>
 				</p>
-				<p className={styles.data_total}>
+				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2DA2BC'}}></div>
 						<div className={styles.circle} style={{borderColor: '#2DA2BC'}}></div>
@@ -635,7 +635,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					<div>
 						Nhỏ nhất:<span>{convertCoin(dataBoardStatistics?.data?.data?.priceMin)} (VNĐ)</span>
 					</div>
-				</p>
+				</p> */}
 				{/* <p className={styles.data_total}>
 					<div className={styles.wrapper}>
 						<div className={styles.line} style={{background: '#2CAE39'}}></div>
@@ -649,7 +649,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 			</div>
 			<div className={styles.main_chart}>
 				<ResponsiveContainer width='100%' height='100%'>
-					<AreaChart
+					<ComposedChart
 						width={500}
 						height={300}
 						data={dataChart}
@@ -662,20 +662,27 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					>
 						<CartesianGrid strokeDasharray='3 3' />
 						<XAxis dataKey='name' scale='point' padding={{left: 40}} />
-						<YAxis domain={[20, 100]} tickFormatter={(value) => convertCoin(value)} />
+						<YAxis domain={[0, 1]} tickFormatter={(value) => convertCoin(value)} />
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
-						{productTypes.map((v) => (
-							<Area
-								key={v.key}
-								type='linear'
-								dataKey={v.key}
-								stroke={v.fill}
-								fill='none'
-								dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
-							/>
-						))}
-					</AreaChart>
+						{productTypes
+							.filter((v) => v.key !== 'Trung bình')
+							.map((v, i) => (
+								<Scatter
+									key={i}
+									dataKey={v.key}
+									stroke='none'
+									fill={v?.fill}
+									// dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
+								/>
+							))}
+
+						{productTypes
+							.filter((v) => v.key === 'Trung bình')
+							.map((v, i) => (
+								<Line key={`line-${i}`} dataKey={'Trung bình'} stroke={v.fill} fill={v?.fill} />
+							))}
+					</ComposedChart>
 				</ResponsiveContainer>
 			</div>
 		</div>
