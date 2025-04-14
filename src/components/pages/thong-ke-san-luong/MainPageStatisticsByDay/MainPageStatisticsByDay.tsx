@@ -12,6 +12,7 @@ import {
 	REGENCY_NAME,
 	TYPE_DATE,
 	TYPE_DATE_SHOW,
+	TYPE_FILTE_TIME,
 	TYPE_PARTNER,
 	TYPE_PRODUCT,
 } from '~/constants/config/enum';
@@ -50,6 +51,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const [uuidCompany, setUuidCompany] = useState<string>('');
 	const [uuidProduct, setUuidProduct] = useState<string>('');
 	const [uuidQuality, setUuidQuality] = useState<string>('');
+	const [uuidTypeShow, setUuidTypeShow] = useState<string>(String(TYPE_FILTE_TIME.NGAY));
 	const [userOwnerUuid, setUserOwnerUuid] = useState<string[]>([]);
 	const [userPartnerUuid, setUserPartnerUuid] = useState<string[]>([]);
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
@@ -388,6 +390,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 			uuidProduct,
 			uuidQuality,
 			userPartnerUuid,
+			uuidTypeShow,
 		],
 		{
 			queryFn: () =>
@@ -405,7 +408,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						timeEnd: _dateTo ? (_dateTo as string) : null,
 						transportType: null,
 						typeFindDay: 0,
-						typeShow: 0,
+						typeShow: Number(uuidTypeShow),
 						userOwnerUuid: userOwnerUuid,
 						userPartnerUuid: userPartnerUuid,
 						warehouseUuid: '',
@@ -454,8 +457,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 				);
 			},
 		})) || [];
-
-	console.log('listStatisticsByDay', listStatisticsByDay);
 
 	useEffect(() => {
 		if (listCompanyUuid) {
@@ -565,6 +566,30 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
 						/>
 					</div>
+					<SelectFilterState
+						isShowAll={false}
+						uuid={uuidTypeShow}
+						setUuid={setUuidTypeShow}
+						listData={[
+							{
+								uuid: String(TYPE_FILTE_TIME.NGAY),
+								name: 'Ngày',
+							},
+							{
+								uuid: String(TYPE_FILTE_TIME.TUAN),
+								name: 'Tuần',
+							},
+							{
+								uuid: String(TYPE_FILTE_TIME.THANG),
+								name: 'Tháng',
+							},
+							{
+								uuid: String(TYPE_FILTE_TIME.NAM),
+								name: 'Năm',
+							},
+						]}
+						placeholder='Dữ liệu TB theo'
+					/>
 				</div>
 			</div>
 			<div className={styles.table}>

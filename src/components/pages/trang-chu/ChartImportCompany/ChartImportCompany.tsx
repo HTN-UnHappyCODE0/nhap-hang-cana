@@ -4,7 +4,7 @@ import {PropsChartImportCompany} from './interfaces';
 import styles from './ChartImportCompany.module.scss';
 
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line} from 'recharts';
-import SelectFilterOption from '../SelectFilterOption';
+
 import SelectFilterDate from '../SelectFilterDate';
 import {useQuery} from '@tanstack/react-query';
 import {
@@ -35,10 +35,10 @@ import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
 import router from 'next/router';
 import companyServices from '~/services/companyServices';
 import commonServices from '~/services/commonServices';
-import SelectFilterMany from '../SelectFilterMany';
 import {convertCoin} from '~/common/funcs/convertCoin';
-import SelectFilterState from '~/components/common/SelectFilterState';
 import partnerServices from '~/services/partnerServices';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import SelectFilterMany from '~/components/common/SelectFilterMany';
 
 function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isShowBDMT, setIsShowBDMT] = useState<string>(String(TYPE_SHOW_BDMT.MT));
@@ -62,6 +62,8 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 	const [dataTotal, setDataTotal] = useState<{
 		totalWeight: number;
 		totalWeightBDMT: number;
+		weightBDMTAvg: number;
+		weightMTAvg: number;
 		drynessAvg: number;
 		lstProductTotal: {
 			name: string;
@@ -74,6 +76,8 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		totalWeightBDMT: 0,
 		drynessAvg: 0,
 		totalWeight: 0,
+		weightMTAvg: 0,
+		weightBDMTAvg: 0,
 		lstProductTotal: [],
 	});
 	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
@@ -300,11 +304,17 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
 						acc[item.productTypeUu.name] = item.weightMT;
 						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg || 50;
+						acc[`${item.productTypeUu.name}_weightAvg`] = data?.weightMTAvg;
 						return acc;
 					}, {});
 
+					const objTotal = {
+						'Trung bình': data?.weightMTAvg || 0,
+					};
+
 					return {
 						name: date,
+						...objTotal,
 						...obj,
 					};
 				});
@@ -322,11 +332,17 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					const obj = v?.[isProductSpec === '2' ? 'specDateWeightUu' : 'productDateWeightUu']?.reduce((acc: any, item: any) => {
 						acc[item.productTypeUu.name] = item.weightBDMT;
 						acc[`${item.productTypeUu.name}_drynessAvg`] = item.drynessAvg || 50;
+						acc[`${item.productTypeUu.name}_weightAvg`] = data?.weightBDMTAvg;
 						return acc;
 					}, {});
 
+					const objTotal = {
+						'Trung bình': data?.weightBDMTAvg || 0,
+					};
+
 					return {
 						name: date,
+						...objTotal,
 						...obj,
 					};
 				});
@@ -346,10 +362,16 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						return acc;
 					}, {});
 
-				const productTypes = Object.keys(productColors).map((key) => ({
-					key,
-					fill: productColors[key],
-				}));
+				const productTypes = [
+					...Object.keys(productColors).map((key) => ({
+						key,
+						fill: productColors[key],
+					})),
+					{
+						key: 'Trung bình',
+						fill: '#FF8C00',
+					},
+				];
 
 				setDataChartMT(dataConvertMT);
 				setDataChartBDMT(dataConvertBDMT);
@@ -358,6 +380,8 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 				setDataTotal({
 					totalWeight: data?.totalWeight,
 					totalWeightBDMT: data?.totalWeightBDMT,
+					weightBDMTAvg: data?.weightBDMTAvg,
+					weightMTAvg: data?.weightMTAvg,
 					drynessAvg: data?.drynessAvg,
 					lstProductTotal: (isProductSpec === '2' ? data?.lstSpecTotal : data?.lstProductTotal)?.map((v: any) => ({
 						name: v?.productTypeUu?.name,
@@ -409,7 +433,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 			<div className={styles.head}>
 				<h3>Biểu đồ thống kê hàng nhập</h3>
 				<div className={styles.filter}>
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={isShowBDMT}
 						setUuid={setIsShowBDMT}
@@ -423,10 +447,10 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								name: 'Tấn khô',
 							},
 						]}
-						placeholder='Tấn hàng'
+						placeholder='Loại hàng'
 					/>
 
-					{/* <SelectFilterOption
+					{/* <SelectFilterState
 						uuid={uuidCompany}
 						setUuid={setUuidCompanyFilter}
 						listData={listCompany?.data?.map((v: any) => ({
@@ -442,7 +466,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả kv cảng xuất khẩu'
+						name='Kv cảng xuất khẩu'
 					/>
 
 					<SelectFilterMany
@@ -452,7 +476,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả quản lý nhập hàng'
+						name='Quản lý nhập hàng'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -461,7 +485,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Công ty'
+						name='Công ty'
 					/>
 					<CheckRegencyCode
 						isPage={false}
@@ -474,7 +498,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							placeholder='Tất cả người quản lý nhân viên thị trường'
+							name='Người quản lý nhân viên thị trường'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany
@@ -484,20 +508,20 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả nhà cung cấp'
+						name='Nhà cung cấp'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						uuid={storageUuid}
 						setUuid={setStorageUuid}
 						listData={listStorage?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả bãi'
+						placeholder='Bãi'
 					/>
 					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
 
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={isProductSpec}
 						setUuid={setIsProductSpec}
@@ -513,7 +537,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						]}
 						placeholder='Kiểu'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						// isShowAll={true}
 						uuid={isTransport}
 						setUuid={setIsTransport}
@@ -527,7 +551,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								name: 'Đường thủy',
 							},
 						]}
-						placeholder='Tất cả vận chuyển'
+						placeholder='Vận chuyển'
 					/>
 					<SelectFilterMany
 						selectedIds={provinceUuid}
@@ -536,7 +560,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả tỉnh thành'
+						name='Tỉnh thành'
 					/>
 				</div>
 			</div>
@@ -548,6 +572,15 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							? convertWeight(dataTotal?.totalWeight)
 							: convertWeight(dataTotal?.totalWeightBDMT)}
 						<span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span>
+					</span>
+				</p>
+				<p className={styles.data_total}>
+					Khối lượng trung bình:{' '}
+					<span>
+						{isShowBDMT === String(TYPE_SHOW_BDMT.MT)
+							? convertWeight(dataTotal?.weightMTAvg)
+							: convertWeight(dataTotal?.weightBDMTAvg)}
+						{/* <span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span> */}
 					</span>
 				</p>
 
@@ -582,7 +615,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 						<YAxis domain={[0, 4000000]} tickFormatter={(value): any => convertWeight(value)} />
 
-						<YAxis yAxisId='right' domain={[minDryness, maxDryness]} orientation='right' tickFormatter={(v) => `${v}%`} />
+						{/* <YAxis yAxisId='right' domain={[minDryness, maxDryness]} orientation='right' tickFormatter={(v) => `${v}%`} /> */}
 
 						<Tooltip
 							formatter={(value, name, props): any => {
@@ -593,20 +626,28 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 
 						<CartesianGrid strokeDasharray='3 3' vertical={false} />
 
-						{productTypes.map((v, i) => (
-							<Bar key={i} dataKey={v?.key} stackId='product_type' fill={v?.fill} />
-						))}
+						{productTypes
+							.filter((v) => v.key !== 'Trung bình')
+							.map((v, i) => (
+								<Bar key={i} dataKey={v?.key} stackId='product_type' fill={v?.fill} />
+							))}
 
-						{productTypes.map((v, i) => (
+						{productTypes
+							.filter((v) => v.key === 'Trung bình')
+							.map((v, i) => (
+								<Line key={`line-${i}`} dataKey='Trung bình' stroke={v?.fill} fill={v?.fill} />
+							))}
+
+						{/* {productTypes.map((v, i) => (
 							<Line
 								key={`line-${i}`}
 								tooltipType='none'
-								dataKey={`${v?.key}_drynessAvg`}
+								dataKey={`Trung bình`}
 								stroke={v?.fill}
 								fill={v?.fill}
-								yAxisId='right'
+								// yAxisId='right'
 							/>
-						))}
+						))} */}
 					</ComposedChart>
 				</ResponsiveContainer>
 			</div>

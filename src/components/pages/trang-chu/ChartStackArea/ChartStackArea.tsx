@@ -4,7 +4,6 @@ import {PropsChartStackArea} from './interfaces';
 import styles from './ChartStackArea.module.scss';
 import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
 import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
-import SelectFilterOption from '../SelectFilterOption';
 import {useQuery} from '@tanstack/react-query';
 import {
 	CONFIG_DESCENDING,
@@ -33,8 +32,9 @@ import moment from 'moment';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import wareServices from '~/services/wareServices';
 import commonServices from '~/services/commonServices';
-import SelectFilterMany from '../SelectFilterMany';
 import partnerServices from '~/services/partnerServices';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import SelectFilterMany from '~/components/common/SelectFilterMany';
 
 function ChartStackArea({}: PropsChartStackArea) {
 	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
@@ -433,7 +433,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả kv cảng xuất khẩu'
+						name='Kv cảng xuất khẩu'
 					/>
 					<CheckRegencyCode
 						isPage={false}
@@ -446,7 +446,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							placeholder='Tất cả quản lý nhập hàng'
+							name='Quản lý nhập hàng'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany
@@ -456,7 +456,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Công ty'
+						name='Công ty'
 					/>
 					<SelectFilterMany
 						selectedIds={userUuid}
@@ -465,7 +465,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						placeholder='Tất cả người quản lý nhân viên thị trường'
+						name='Người quản lý nhân viên thị trường'
 					/>
 					<SelectFilterMany
 						isShowAll={false}
@@ -475,9 +475,9 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Chọn nhà cung cấp'
+						name='Nhà cung cấp'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						isShowAll={false}
 						uuid={productUuid}
 						setUuid={setProductUuid}
@@ -485,7 +485,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả loại hàng'
+						placeholder='Loại hàng'
 					/>
 					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
 
@@ -496,16 +496,16 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả tỉnh thành'
+						name='Tỉnh thành'
 					/>
-					<SelectFilterOption
+					<SelectFilterState
 						uuid={uuidQuality}
 						setUuid={setUuidQuality}
 						listData={listQuality?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả quốc gia'
+						placeholder='Quốc gia'
 					/>
 				</div>
 			</div>

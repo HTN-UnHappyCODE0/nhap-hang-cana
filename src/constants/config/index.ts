@@ -196,17 +196,17 @@ export const Menu: {
 					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
 				],
 			},
-			{
-				title: 'Thống kê chất lượng theo quy cách',
-				icon: icons.thongketheoquycach,
-				path: PATH.ThongKeChatLuongTheoQuyCach,
-				regencys: [
-					REGENCY_CODE.GIAM_DOC,
-					REGENCY_CODE.PHO_GIAM_DOC,
-					REGENCY_CODE.QUAN_LY_NHAP_HANG,
-					REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
-				],
-			},
+			// {
+			// 	title: 'Thống kê chất lượng theo quy cách',
+			// 	icon: icons.thongketheoquycach,
+			// 	path: PATH.ThongKeChatLuongTheoQuyCach,
+			// 	regencys: [
+			// 		REGENCY_CODE.GIAM_DOC,
+			// 		REGENCY_CODE.PHO_GIAM_DOC,
+			// 		REGENCY_CODE.QUAN_LY_NHAP_HANG,
+			// 		REGENCY_CODE.NHAN_VIEN_THI_TRUONG,
+			// 	],
+			// },
 		],
 	},
 	{
