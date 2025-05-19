@@ -1,11 +1,7 @@
-import React, {useEffect, useState} from 'react';
-
+import React, {useState} from 'react';
 import {PropsChartImportCompany} from './interfaces';
 import styles from './ChartImportCompany.module.scss';
-
-import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line} from 'recharts';
-
-import SelectFilterDate from '../SelectFilterDate';
+import {Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line} from 'recharts';
 import {useQuery} from '@tanstack/react-query';
 import {
 	CONFIG_DESCENDING,
@@ -13,13 +9,7 @@ import {
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
-	REGENCY_CODE,
-	REGENCY_NAME,
-	STATUS_CUSTOMER,
-	TYPE_CUSTOMER,
-	TYPE_DATE,
 	TYPE_DATE_SHOW,
-	TYPE_PARTNER,
 	TYPE_SHOW_BDMT,
 	TYPE_TRANSPORT,
 } from '~/constants/config/enum';
@@ -27,37 +17,18 @@ import {httpRequest} from '~/services';
 import batchBillServices from '~/services/batchBillServices';
 import moment from 'moment';
 import {convertWeight, timeSubmit} from '~/common/funcs/optionConvert';
-import customerServices from '~/services/customerServices';
 import storageServices from '~/services/storageServices';
-import regencyServices from '~/services/regencyServices';
-import userServices from '~/services/userServices';
-import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
-import router from 'next/router';
-import companyServices from '~/services/companyServices';
-import commonServices from '~/services/commonServices';
-import {convertCoin} from '~/common/funcs/convertCoin';
-import partnerServices from '~/services/partnerServices';
 import SelectFilterState from '~/components/common/SelectFilterState';
-import SelectFilterMany from '~/components/common/SelectFilterMany';
+import {usePageHomeContext} from '../context';
 
 function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isShowBDMT, setIsShowBDMT] = useState<string>(String(TYPE_SHOW_BDMT.MT));
 	const [isProductSpec, setIsProductSpec] = useState<string>('1');
 	const [isTransport, setIsTransport] = useState<string>('');
-	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
-	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
-	const [userUuid, setUserUuid] = useState<string[]>([]);
 	const [storageUuid, setStorageUuid] = useState<string>('');
-	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.LAST_7_DAYS);
-	const [uuidCompany, setUuidCompanyFilter] = useState<string[]>([]);
-	const [date, setDate] = useState<{
-		from: Date | null;
-		to: Date | null;
-	} | null>(null);
 
 	const [dataChartMT, setDataChartMT] = useState<any[]>([]);
 	const [dataChartBDMT, setDataChartBDMT] = useState<any[]>([]);
-	const [userPartnerUuid, setUserPartnerUuid] = useState<string[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [dataTotal, setDataTotal] = useState<{
 		totalWeight: number;
@@ -80,34 +51,9 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		weightBDMTAvg: 0,
 		lstProductTotal: [],
 	});
-	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
 
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, listPartnerUuid, userUuid], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: customerServices.listCustomer({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					partnerUUid: '',
-					userUuid: '',
-					status: STATUS_CUSTOMER.HOP_TAC,
-					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
-					provinceId: '',
-					specUuid: '',
-					listCompanyUuid: uuidCompany,
-					listPartnerUUid: listPartnerUuid,
-					listUserUuid: userUuid,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
+	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid} =
+		usePageHomeContext();
 
 	const listStorage = useQuery([QUERY_KEY.dropdown_bai], {
 		queryFn: () =>
@@ -132,139 +78,18 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		},
 	});
 
-	const listRegency = useQuery([QUERY_KEY.dropdown_chuc_vu], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: regencyServices.listRegency({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listProvince = useQuery([QUERY_KEY.dropdown_tinh_thanh_pho], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: commonServices.listProvince({
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: companyServices.listCompany({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listUserPurchasing = useQuery([QUERY_KEY.dropdown_quan_ly_nhap_hang], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: userServices.listUser2({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-					provinceIDOwer: '',
-					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])?.uuid],
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: listRegency.isSuccess,
-	});
-
-	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: userServices.listUser2({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-					provinceIDOwer: '',
-					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Nhân viên thị trường'])?.uuid],
-					parentUuid: '',
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: listRegency.isSuccess,
-	});
-
-	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany, userPartnerUuid], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: partnerServices.listPartner({
-					pageSize: 50,
-					page: 1,
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					userUuid: '',
-					provinceId: '',
-					type: TYPE_PARTNER.NCC,
-					listCompanyUuid: uuidCompany,
-					listUserUuid: userPartnerUuid,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
 	useQuery(
 		[
 			QUERY_KEY.thong_ke_tong_hang_nhap,
-			customerUuid,
+			listCustomerUuid,
 			storageUuid,
 			date,
-			userUuid,
-			uuidCompany,
+			listUserOwnerUuid,
+			listCompanyUuid,
 			isProductSpec,
 			provinceUuid,
 			isTransport,
-			userPartnerUuid,
+			listUserPurchasingUuid,
 			listPartnerUuid,
 		],
 		{
@@ -273,11 +98,11 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					isData: true,
 					http: batchBillServices.dashbroadBillIn({
 						partnerUuid: '',
-						customerUuid: customerUuid,
+						customerUuid: listCustomerUuid,
 						isShowBDMT: 1,
 						storageUuid: storageUuid,
-						userOwnerUuid: userUuid,
-						userPartnerUuid: userPartnerUuid,
+						userOwnerUuid: listUserOwnerUuid,
+						userPartnerUuid: listUserPurchasingUuid,
 						warehouseUuid: '',
 						companyUuid: '',
 						typeFindDay: 0,
@@ -285,7 +110,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						timeEnd: timeSubmit(date?.to, true)!,
 						provinceId: provinceUuid,
 						transportType: isTransport ? Number(isTransport) : null,
-						listCompanyUuid: uuidCompany,
+						listCompanyUuid: listCompanyUuid,
 						listPartnerUuid: listPartnerUuid,
 					}),
 				}),
@@ -392,35 +217,9 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					})),
 				});
 			},
+			enabled: !!date?.from && !!date?.to,
 		}
 	);
-
-	useEffect(() => {
-		if (uuidCompany) {
-			setCustomerUuid([]);
-		}
-		if (listPartnerUuid) {
-			setCustomerUuid([]);
-		}
-	}, [uuidCompany, listPartnerUuid]);
-
-	useEffect(() => {
-		if (uuidCompany) {
-			setListPartnerUuid([]);
-		}
-	}, [uuidCompany]);
-
-	useEffect(() => {
-		if (userUuid) {
-			setCustomerUuid([]);
-		}
-	}, [userUuid]);
-
-	useEffect(() => {
-		if (userPartnerUuid) {
-			setListPartnerUuid([]);
-		}
-	}, [userPartnerUuid]);
 
 	const currentData = isShowBDMT === String(TYPE_SHOW_BDMT.MT) ? dataChartMT : dataChartBDMT;
 
@@ -459,7 +258,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Tất cả kv cảng xuất khẩu'
 					/> */}
-					<SelectFilterMany
+					{/* <SelectFilterMany
 						selectedIds={uuidCompany}
 						setSelectedIds={setUuidCompanyFilter}
 						listData={listCompany?.data?.map((v: any) => ({
@@ -509,7 +308,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							name: v?.name,
 						}))}
 						name='Nhà cung cấp'
-					/>
+					/> */}
 					<SelectFilterState
 						uuid={storageUuid}
 						setUuid={setStorageUuid}
@@ -519,7 +318,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Bãi'
 					/>
-					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
+					{/* <SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} /> */}
 
 					<SelectFilterState
 						isShowAll={false}
@@ -552,15 +351,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							},
 						]}
 						placeholder='Vận chuyển'
-					/>
-					<SelectFilterMany
-						selectedIds={provinceUuid}
-						setSelectedIds={setProvinceUuid}
-						listData={listProvince?.data?.map((v: any) => ({
-							uuid: v?.matp,
-							name: v?.name,
-						}))}
-						name='Tỉnh thành'
 					/>
 				</div>
 			</div>
