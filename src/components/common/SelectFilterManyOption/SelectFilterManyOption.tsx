@@ -87,36 +87,55 @@ function SelectFilterManyOption({
 								{tempSelectedIds.length === 0 && <BiCheck fontSize={18} color='#5755FF' fontWeight={600} />}
 							</div>
 						)}
-						<div className={styles.optionGroup}>
-							{matchList.length > 0 && (
-								<div className={styles.group}>
-									<p className={styles.groupTitle}>{splitGroupNames[0]}</p>
-									{matchList.map((v) => (
-										<div
-											key={v.uuid}
-											className={clsx(styles.option, {[styles.option_active]: tempSelectedIds.includes(v.uuid)})}
-											onClick={() => handleSelectItem(v.uuid)}
-										>
-											<p className={styles.textOverflow}>{v.name}</p>
-											{tempSelectedIds.includes(v.uuid) && <BiCheck fontSize={20} fontWeight={600} />}
+						<div>
+							{!splitCondition ? (
+								filteredData.map((v) => (
+									<div
+										key={v.uuid}
+										className={clsx(styles.option, {[styles.option_active]: tempSelectedIds.includes(v.uuid)})}
+										onClick={() => handleSelectItem(v.uuid)}
+									>
+										<p className={styles.textOverflow}>{v.name}</p>
+										{tempSelectedIds.includes(v.uuid) && <BiCheck fontSize={20} fontWeight={600} />}
+									</div>
+								))
+							) : (
+								<div className={styles.optionGroup}>
+									{matchList.length > 0 && (
+										<div className={styles.group}>
+											<p className={styles.groupTitle}>{splitGroupNames[0]}</p>
+											{matchList.map((v) => (
+												<div
+													key={v.uuid}
+													className={clsx(styles.option, {
+														[styles.option_active]: tempSelectedIds.includes(v.uuid),
+													})}
+													onClick={() => handleSelectItem(v.uuid)}
+												>
+													<p className={styles.textOverflow}>{v.name}</p>
+													{tempSelectedIds.includes(v.uuid) && <BiCheck fontSize={20} fontWeight={600} />}
+												</div>
+											))}
 										</div>
-									))}
-								</div>
-							)}
+									)}
 
-							{unmatchList.length > 0 && (
-								<div className={styles.group}>
-									<p className={styles.groupTitle}>{splitGroupNames[1]}</p>
-									{unmatchList.map((v) => (
-										<div
-											key={v.uuid}
-											className={clsx(styles.option, {[styles.option_active]: tempSelectedIds.includes(v.uuid)})}
-											onClick={() => handleSelectItem(v.uuid)}
-										>
-											<p className={styles.textOverflow}>{v.name}</p>
-											{tempSelectedIds.includes(v.uuid) && <BiCheck fontSize={20} fontWeight={600} />}
+									{unmatchList.length > 0 && (
+										<div className={styles.group}>
+											<p className={styles.groupTitle}>{splitGroupNames[1]}</p>
+											{unmatchList.map((v) => (
+												<div
+													key={v.uuid}
+													className={clsx(styles.option, {
+														[styles.option_active]: tempSelectedIds.includes(v.uuid),
+													})}
+													onClick={() => handleSelectItem(v.uuid)}
+												>
+													<p className={styles.textOverflow}>{v.name}</p>
+													{tempSelectedIds.includes(v.uuid) && <BiCheck fontSize={20} fontWeight={600} />}
+												</div>
+											))}
 										</div>
-									))}
+									)}
 								</div>
 							)}
 						</div>

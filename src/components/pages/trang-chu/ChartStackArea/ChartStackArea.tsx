@@ -228,14 +228,13 @@ function ChartStackArea({}: PropsChartStackArea) {
 			<div className={styles.head}>
 				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
 				<div className={styles.filter}>
-					{/* <SelectFilterMany
-						selectedIds={uuidCompany}
-						setSelectedIds={setUuidCompanyFilter}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng xuất khẩu'
+					{/* <SelectFilterManyOption
+						splitCondition={(v) => v?.type === 0}
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
+						selectedIds={listCompanyUuid}
+						setSelectedIds={setListCompanyUuid}
+						listData={listCompany?.data}
+						name='Kv kho'
 					/>
 					<CheckRegencyCode
 						isPage={false}

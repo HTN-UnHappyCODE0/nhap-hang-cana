@@ -258,14 +258,13 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Tất cả kv cảng xuất khẩu'
 					/> */}
-					{/* <SelectFilterMany
-						selectedIds={uuidCompany}
-						setSelectedIds={setUuidCompanyFilter}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng xuất khẩu'
+					{/* <SelectFilterManyOption
+						splitCondition={(v) => v?.type === 0}
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
+						selectedIds={listCompanyUuid}
+						setSelectedIds={setListCompanyUuid}
+						listData={listCompany?.data}
+						name='Kv kho'
 					/>
 
 					<SelectFilterMany

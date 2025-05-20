@@ -273,15 +273,14 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 			<div className={styles.head}>
 				<h3>Biểu đồ thống kê chất lượng</h3>
 				<div className={styles.filter}>
-					{/* <SelectFilterMany
-						selectedIds={listCompanyUuid}
-						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng xuất khẩu'
-					/>
+					{/* <SelectFilterManyOption
+											splitCondition={(v) => v?.type === 0}
+											splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
+											selectedIds={listCompanyUuid}
+											setSelectedIds={setListCompanyUuid}
+											listData={listCompany?.data}
+											name='Kv kho'
+										/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
 						setSelectedIds={setUserPartnerUuid}

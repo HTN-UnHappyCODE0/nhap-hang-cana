@@ -40,6 +40,7 @@ import Loading from '~/components/common/Loading';
 import regencyServices from '~/services/regencyServices';
 import userServices from '~/services/userServices';
 import Pagination from '~/components/common/Pagination';
+import SelectFilterManyOption from '~/components/common/SelectFilterManyOption';
 
 function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	const router = useRouter();
@@ -271,7 +272,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 		enabled: listRegency.isSuccess,
 	});
 
-	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong], {
+	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong, userPartnerUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -286,6 +287,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					provinceIDOwer: '',
 					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Nhân viên thị trường'])?.uuid],
 					parentUuid: '',
+					listParentUuid: userPartnerUuid,
 				}),
 			}),
 		select(data) {
@@ -332,6 +334,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 	useEffect(() => {
 		if (userPartnerUuid) {
 			setListPartnerUuid([]);
+			setUserOwnerUuid([]);
 		}
 	}, [userPartnerUuid]);
 
@@ -475,14 +478,13 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 					{/* <div className={styles.search}>
 						<Search keyName='_keyword' placeholder='Tìm kiếm ...' />
 					</div> */}
-					<SelectFilterMany
+					<SelectFilterManyOption
+						splitCondition={(v) => v?.type === 0}
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng xuất khẩu'
+						listData={listCompany?.data}
+						name='Kv kho'
 					/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -494,15 +496,6 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						name='Quản lý nhập hàng'
 					/>
 					<SelectFilterMany
-						selectedIds={listPartnerUuid}
-						setSelectedIds={setListPartnerUuid}
-						listData={listPartner?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Công ty'
-					/>
-					<SelectFilterMany
 						selectedIds={userOwnerUuid}
 						setSelectedIds={setUserOwnerUuid}
 						listData={listUserMarket?.data?.map((v: any) => ({
@@ -511,6 +504,16 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						}))}
 						name='Quản lý nhân viên thị trường'
 					/>
+					<SelectFilterMany
+						selectedIds={listPartnerUuid}
+						setSelectedIds={setListPartnerUuid}
+						listData={listPartner?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						name='Công ty'
+					/>
+
 					<SelectFilterMany
 						selectedIds={customerUuid}
 						setSelectedIds={setCustomerUuid}

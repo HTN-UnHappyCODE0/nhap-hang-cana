@@ -31,6 +31,7 @@ import customerServices from '~/services/customerServices';
 import FlexLayout from '~/components/layouts/FlexLayout';
 import FullColumnFlex from '~/components/layouts/FlexLayout/components/FullColumnFlex';
 import SelectFilterManyOption from '~/components/common/SelectFilterManyOption';
+import SelectFilterManyList from '~/components/common/SelectFilterManyList';
 
 function MainDashboard({}: PropsMainDashboard) {
 	const [date, setDate] = useState<{
@@ -230,14 +231,14 @@ function MainDashboard({}: PropsMainDashboard) {
 				<div className={styles.main_filter}>
 					<SelectFilterManyOption
 						splitCondition={(v) => v?.type === 0}
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
-						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
 						listData={listCompany?.data}
 						name='Kv kho'
 					/>
 
-					<SelectFilterMany
+					<SelectFilterManyOption
 						selectedIds={listUserPurchasingUuid}
 						setSelectedIds={setListUserPurchasingUuid}
 						listData={listUserPurchasing?.data?.map((v: any) => ({
@@ -245,6 +246,14 @@ function MainDashboard({}: PropsMainDashboard) {
 							name: v?.fullName,
 						}))}
 						name='Quản lý nhập hàng'
+						// content
+						// selectedIdsContent={listUserOwnerUuid}
+						// setSelectedIdsContent={setListUserOwnerUuid}
+						// listDataContent={listUserMarket?.data?.map((v: any) => ({
+						// 	uuid: v?.uuid,
+						// 	name: v?.fullName,
+						// }))}
+						// nameContent='Người quản lý nhân viên thị trường'
 					/>
 
 					<SelectFilterMany

@@ -44,6 +44,7 @@ import truckServices from '~/services/truckServices';
 import shipServices from '~/services/shipServices';
 import Link from 'next/link';
 import StateActive from '~/components/common/StateActive';
+import SelectFilterManyOption from '~/components/common/SelectFilterManyOption';
 
 function TableImport({uuid}: PropsTableImport) {
 	const router = useRouter();
@@ -343,14 +344,13 @@ function TableImport({uuid}: PropsTableImport) {
 						}))}
 						placeholder='Kv cảng xuất khẩu'
 					/> */}
-					<SelectFilterMany
+					<SelectFilterManyOption
+						splitCondition={(v) => v?.type === 0}
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng xuất khẩu'
+						listData={listCompany?.data}
+						name='Kv kho'
 					/>
 
 					<FilterCustom
