@@ -1,4 +1,12 @@
 .head {
+	top: 0;
+	z-index: 99999;
+	background-color: #fff;
+	padding: 12px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

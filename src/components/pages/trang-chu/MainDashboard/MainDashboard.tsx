@@ -28,6 +28,9 @@ import userServices from '~/services/userServices';
 import regencyServices from '~/services/regencyServices';
 import partnerServices from '~/services/partnerServices';
 import customerServices from '~/services/customerServices';
+import FlexLayout from '~/components/layouts/FlexLayout';
+import FullColumnFlex from '~/components/layouts/FlexLayout/components/FullColumnFlex';
+import SelectFilterManyOption from '~/components/common/SelectFilterManyOption';
 
 function MainDashboard({}: PropsMainDashboard) {
 	const [date, setDate] = useState<{
@@ -128,7 +131,7 @@ function MainDashboard({}: PropsMainDashboard) {
 		},
 	});
 
-	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong], {
+	const listUserMarket = useQuery([QUERY_KEY.dropdown_nhan_vien_thi_truong, listUserPurchasingUuid], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -143,6 +146,7 @@ function MainDashboard({}: PropsMainDashboard) {
 					provinceIDOwer: '',
 					regencyUuid: [listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Nhân viên thị trường'])?.uuid],
 					parentUuid: '',
+					listParentUuid: listUserPurchasingUuid,
 				}),
 			}),
 		select(data) {
@@ -216,22 +220,23 @@ function MainDashboard({}: PropsMainDashboard) {
 	useEffect(() => {
 		if (listUserPurchasingUuid) {
 			setListPartnerUuid([]);
+			setListUserOwnerUuid([]);
 		}
 	}, [listUserPurchasingUuid]);
 
 	return (
-		<div className={styles.container}>
+		<FlexLayout>
 			<div className={styles.head}>
 				<div className={styles.main_filter}>
-					<SelectFilterMany
+					<SelectFilterManyOption
+						splitCondition={(v) => v?.type === 0}
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Kv cảng'
+						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
+						listData={listCompany?.data}
+						name='Kv kho'
 					/>
+
 					<SelectFilterMany
 						selectedIds={listUserPurchasingUuid}
 						setSelectedIds={setListUserPurchasingUuid}
@@ -241,15 +246,7 @@ function MainDashboard({}: PropsMainDashboard) {
 						}))}
 						name='Quản lý nhập hàng'
 					/>
-					<SelectFilterMany
-						selectedIds={listPartnerUuid}
-						setSelectedIds={setListPartnerUuid}
-						listData={listPartner?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Công ty'
-					/>
+
 					<SelectFilterMany
 						selectedIds={listUserOwnerUuid}
 						setSelectedIds={setListUserOwnerUuid}
@@ -258,6 +255,15 @@ function MainDashboard({}: PropsMainDashboard) {
 							name: v?.fullName,
 						}))}
 						name='Người quản lý nhân viên thị trường'
+					/>
+					<SelectFilterMany
+						selectedIds={listPartnerUuid}
+						setSelectedIds={setListPartnerUuid}
+						listData={listPartner?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						name='Công ty'
 					/>
 					<SelectFilterMany
 						selectedIds={listCustomerUuid}
@@ -282,22 +288,24 @@ function MainDashboard({}: PropsMainDashboard) {
 				</div>
 			</div>
 
-			<ContextPageHome.Provider
-				value={{
-					date: date,
-					provinceUuid: provinceUuid,
-					listCompanyUuid: listCompanyUuid,
-					listUserPurchasingUuid: listUserPurchasingUuid,
-					listPartnerUuid: listPartnerUuid,
-					listUserOwnerUuid: listUserOwnerUuid,
-					listCustomerUuid: listCustomerUuid,
-				}}
-			>
-				<ChartImportCompany />
-				<ChartStackArea />
-				<ChartStackStatisticsByDay />
-			</ContextPageHome.Provider>
-		</div>
+			<FullColumnFlex>
+				<ContextPageHome.Provider
+					value={{
+						date: date,
+						provinceUuid: provinceUuid,
+						listCompanyUuid: listCompanyUuid,
+						listUserPurchasingUuid: listUserPurchasingUuid,
+						listPartnerUuid: listPartnerUuid,
+						listUserOwnerUuid: listUserOwnerUuid,
+						listCustomerUuid: listCustomerUuid,
+					}}
+				>
+					<ChartImportCompany />
+					<ChartStackArea />
+					<ChartStackStatisticsByDay />
+				</ContextPageHome.Provider>
+			</FullColumnFlex>
+		</FlexLayout>
 	);
 }
 
