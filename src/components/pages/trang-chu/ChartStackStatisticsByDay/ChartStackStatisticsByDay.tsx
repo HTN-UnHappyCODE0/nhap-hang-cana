@@ -205,13 +205,9 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						{}
 					);
 
-					const objDay = data?.lstInfoDaily?.reduce(
-						(acc: any, {timeScale, percentAvg}: {timeScale: string; percentAvg: number}) => {
-							acc[timeScale] = percentAvg;
-							return acc;
-						},
-						{}
-					);
+					const objDay = {
+						['Theo thời gian']: v?.percentAvg || 0,
+					};
 
 					return {
 						name: date,
@@ -233,7 +229,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							},
 
 							{
-								key: 'percentDay',
+								key: 'Theo thời gian',
 								fill: '#2A85FF',
 							},
 
@@ -436,7 +432,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
 						{productTypes
-							.filter((v) => v.key !== 'Trung bình' && v.key !== 'percentDay')
+							.filter((v) => v.key !== 'Trung bình' && v.key !== 'Theo thời gian')
 							.map((v, i) => (
 								<Scatter
 									key={i}
@@ -448,11 +444,11 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							))}
 
 						{productTypes
-							.filter((v) => v.key == 'percentDay')
+							.filter((v) => v.key === 'Theo thời gian')
 							.map((v, i) => (
 								<Scatter
 									key={`percentDay-${i}`}
-									dataKey={'percentDay'}
+									dataKey={'Theo thời gian'}
 									stroke='none'
 									fill={v?.fill}
 									// dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
