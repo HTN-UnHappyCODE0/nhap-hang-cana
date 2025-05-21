@@ -492,7 +492,11 @@ function MainPriceTagCurrent({}: PropsMainPriceTagCurrent) {
 											icon={<FaHistory fontSize={20} fontWeight={600} />}
 											tooltip='Xem lịch sử'
 											color='#777E90'
-											href={`/gia-tien-hang/lich-su?_customerUuid=${data?.customerUu?.uuid}&_specUuid=${data?.specUu?.uuid}&_productTypeUuid=${data?.productTypeUu?.uuid}&_transportType=${data?.transportType}`}
+											href={`/gia-tien-hang/lich-su?_customerUuid=${data?.customerUu?.uuid || ''}&_specUuid=${
+												data?.specUu?.uuid || ''
+											}&_productTypeUuid=${data?.productTypeUu?.uuid || ''}&_transportType=${
+												data?.transportType || ''
+											}`}
 										/>
 										<IconCustom
 											icon={<LuPencil size='22' />}

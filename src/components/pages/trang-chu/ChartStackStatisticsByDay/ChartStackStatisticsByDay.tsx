@@ -205,8 +205,17 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						{}
 					);
 
+					const objDay = data?.lstInfoDaily?.reduce(
+						(acc: any, {timeScale, percentAvg}: {timeScale: string; percentAvg: number}) => {
+							acc[timeScale] = percentAvg;
+							return acc;
+						},
+						{}
+					);
+
 					return {
 						name: date,
+						...objDay,
 						...objTotal,
 						...obj,
 					};
@@ -221,6 +230,11 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							{
 								key: 'Trung bình',
 								fill: '#FF6838',
+							},
+
+							{
+								key: 'percentDay',
+								fill: '#2A85FF',
 							},
 
 							...v?.customerDateWeightUu.map((v: any) => ({
@@ -249,6 +263,8 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 			enabled: !!date?.from && !!date?.to,
 		}
 	);
+
+	console.log('dataChart', dataChart);
 
 	useEffect(() => {
 		if (uuidProduct) {
@@ -420,11 +436,23 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
 						{productTypes
-							.filter((v) => v.key !== 'Trung bình')
+							.filter((v) => v.key !== 'Trung bình' && v.key !== 'percentDay')
 							.map((v, i) => (
 								<Scatter
 									key={i}
 									dataKey={v.key}
+									stroke='none'
+									fill={v?.fill}
+									// dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
+								/>
+							))}
+
+						{productTypes
+							.filter((v) => v.key == 'percentDay')
+							.map((v, i) => (
+								<Scatter
+									key={`percentDay-${i}`}
+									dataKey={'percentDay'}
 									stroke='none'
 									fill={v?.fill}
 									// dot={{r: 4, fill: '#fff', stroke: v.fill, strokeWidth: 2}}
