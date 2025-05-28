@@ -264,7 +264,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 
 					<SelectFilterMany
@@ -274,7 +274,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhập hàng'
+						name='QLNH'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -296,7 +296,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							name='Người quản lý nhân viên thị trường'
+							name='NVTT'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany
@@ -306,7 +306,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/> */}
 					<SelectFilterState
 						uuid={storageUuid}

@@ -235,7 +235,7 @@ function MainDashboard({}: PropsMainDashboard) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 
 					<SelectFilterManyOption
@@ -245,7 +245,7 @@ function MainDashboard({}: PropsMainDashboard) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhập hàng'
+						name='QLNH'
 						// content
 						// selectedIdsContent={listUserOwnerUuid}
 						// setSelectedIdsContent={setListUserOwnerUuid}
@@ -263,7 +263,7 @@ function MainDashboard({}: PropsMainDashboard) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Người quản lý nhân viên thị trường'
+						name='NVTT'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -281,7 +281,7 @@ function MainDashboard({}: PropsMainDashboard) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/>
 					<SelectFilterMany
 						selectedIds={provinceUuid}
@@ -290,7 +290,7 @@ function MainDashboard({}: PropsMainDashboard) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						name='Tỉnh thành'
+						name='Tỉnh'
 					/>
 
 					<SelectFilterDate date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />

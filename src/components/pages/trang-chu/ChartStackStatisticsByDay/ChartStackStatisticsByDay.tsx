@@ -291,7 +291,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 											selectedIds={listCompanyUuid}
 											setSelectedIds={setListCompanyUuid}
 											listData={listCompany?.data}
-											name='Kv kho'
+											name='Kho'
 										/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -300,7 +300,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhập hàng'
+						name='QLNH'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -328,7 +328,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/> */}
 
 					<SelectFilterState

@@ -234,7 +234,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 					<CheckRegencyCode
 						isPage={false}
@@ -247,7 +247,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 								uuid: v?.uuid,
 								name: v?.fullName,
 							}))}
-							name='Quản lý nhập hàng'
+							name='QLNH'
 						/>
 					</CheckRegencyCode>
 					<SelectFilterMany
@@ -266,7 +266,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Người quản lý nhân viên thị trường'
+						name='NVTT'
 					/>
 					<SelectFilterMany
 						isShowAll={false}
@@ -276,7 +276,7 @@ function ChartStackArea({}: PropsChartStackArea) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/> */}
 					<SelectFilterState
 						isShowAll={false}

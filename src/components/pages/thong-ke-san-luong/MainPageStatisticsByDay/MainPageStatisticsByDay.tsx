@@ -484,7 +484,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -493,7 +493,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhập hàng'
+						name='QLNH'
 					/>
 					<SelectFilterMany
 						selectedIds={userOwnerUuid}
@@ -521,7 +521,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/>
 
 					<SelectFilterMany
@@ -531,7 +531,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						name='Tỉnh thành'
+						name='Tỉnh'
 					/>
 					<SelectFilterState
 						uuid={uuidProduct}

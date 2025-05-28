@@ -583,7 +583,7 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 						<div className={styles.filter}>
 							<FilterCustom
 								isSearch
-								name='Nhà cung cấp'
+								name='NCC'
 								query='_partnerUuid'
 								listFilter={listPartner?.data?.map((v: any) => ({
 									id: v?.uuid,
@@ -594,7 +594,7 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 						<div className={styles.filter}>
 							<FilterCustom
 								isSearch
-								name='Nhà cung cấp'
+								name='NCC'
 								query='_customerUuid'
 								listFilter={listCustomer?.data?.map((v: any) => ({
 									id: v?.uuid,

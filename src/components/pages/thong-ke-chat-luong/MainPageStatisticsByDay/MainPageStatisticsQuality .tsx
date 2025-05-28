@@ -525,7 +525,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 					<SelectFilterMany
 						selectedIds={userPartnerUuid}
@@ -562,7 +562,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						name='Nhà cung cấp'
+						name='NCC'
 					/>
 
 					<SelectFilterMany

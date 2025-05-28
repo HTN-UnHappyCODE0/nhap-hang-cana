@@ -350,7 +350,7 @@ function TableImport({uuid}: PropsTableImport) {
 						selectedIds={listCompanyUuid}
 						setSelectedIds={setListCompanyUuid}
 						listData={listCompany?.data}
-						name='Kv kho'
+						name='Kho'
 					/>
 
 					<FilterCustom
