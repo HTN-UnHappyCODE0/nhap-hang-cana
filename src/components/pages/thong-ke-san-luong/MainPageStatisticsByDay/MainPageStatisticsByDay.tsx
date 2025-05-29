@@ -502,7 +502,7 @@ function MainPageStatisticsByDay({}: PropsMainPageStatisticsByDay) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Quản lý nhân viên thị trường'
+						name='NVTT'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}

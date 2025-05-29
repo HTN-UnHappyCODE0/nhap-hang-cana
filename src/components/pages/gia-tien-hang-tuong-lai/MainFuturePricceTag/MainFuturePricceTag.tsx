@@ -316,7 +316,7 @@ function MainFuturePricceTag({}: PropsMainFuturePricceTag) {
 							<div className={styles.filter}>
 								<FilterCustom
 									isSearch
-									name='Nhân viên thị trường'
+									name='NVTT'
 									query='_userOwnerUuid'
 									listFilter={listUserMarket?.data?.map((v: any) => ({
 										id: v?.uuid,

@@ -24,8 +24,24 @@
 .filter {
 	display: flex;
 	align-items: center;
-	flex-wrap: wrap;
-	gap: 10px;
+	gap: 12px;
+	padding-bottom: 12px;
+	overflow: auto;
+
+	&::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	/* Track */
+	&::-webkit-scrollbar-track {
+		background: #f8f8f8;
+	}
+
+	/* Handle */
+	&::-webkit-scrollbar-thumb {
+		background: #ccc;
+	}
 }
 
 .main_chart {

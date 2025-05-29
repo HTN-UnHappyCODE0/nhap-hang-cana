@@ -534,7 +534,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Tất cả quản lý nhập hàng'
+						name='QLNH'
 					/>
 					<SelectFilterMany
 						selectedIds={userOwnerUuid}
@@ -543,7 +543,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.fullName,
 						}))}
-						name='Tất cả quản lý nhân viên thị trường'
+						name='NVTT'
 					/>
 					<SelectFilterMany
 						selectedIds={listPartnerUuid}
@@ -572,7 +572,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.matp,
 							name: v?.name,
 						}))}
-						name='Tất cả tỉnh thành'
+						name='Tỉnh'
 					/>
 					<SelectFilterState
 						isShowAll={false}
@@ -582,7 +582,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả loại hàng'
+						placeholder='Loại hàng'
 					/>
 
 					<SelectFilterState
@@ -602,7 +602,7 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả quy cách'
+						placeholder='Quy cách'
 					/>
 					<SelectFilterState
 						isShowAll={false}
@@ -612,16 +612,14 @@ function MainPageStatisticsQuality({}: PropsMainPageStatisticsQuality) {
 							uuid: v?.uuid,
 							name: v?.title,
 						}))}
-						placeholder='Tất cả tiêu chí'
+						placeholder='Tiêu chí'
 					/>
 
-					<div className={styles.filter}>
-						<DateRangerCustom
-							titleTime='Thời gian'
-							typeDateDefault={TYPE_DATE.LAST_7_DAYS}
-							typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
-						/>
-					</div>
+					<DateRangerCustom
+						titleTime='Thời gian'
+						typeDateDefault={TYPE_DATE.LAST_7_DAYS}
+						typeDateNotShow={[TYPE_DATE.YESTERDAY, TYPE_DATE.TODAY]}
+					/>
 				</div>
 			</div>
 			<div className={styles.table}>
