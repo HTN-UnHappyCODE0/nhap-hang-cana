@@ -17,6 +17,7 @@ import {
 	TYPE_CUSTOMER,
 	TYPE_DATE,
 	TYPE_PARTNER,
+	TYPE_PRODUCT,
 } from '~/constants/config/enum';
 import {ContextPageHome} from '../context';
 import SelectFilterMany from '~/components/common/SelectFilterMany';
@@ -32,6 +33,8 @@ import FlexLayout from '~/components/layouts/FlexLayout';
 import FullColumnFlex from '~/components/layouts/FlexLayout/components/FullColumnFlex';
 import SelectFilterManyOption from '~/components/common/SelectFilterManyOption';
 import SelectFilterManyList from '~/components/common/SelectFilterManyList';
+import wareServices from '~/services/wareServices';
+import SelectFilterState from '~/components/common/SelectFilterState';
 
 function MainDashboard({}: PropsMainDashboard) {
 	const [date, setDate] = useState<{
@@ -41,6 +44,7 @@ function MainDashboard({}: PropsMainDashboard) {
 
 	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.LAST_7_DAYS);
 	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
+	const [productUuid, setProductUuid] = useState<string>('');
 
 	const [listCompanyUuid, setListCompanyUuid] = useState<string[]>([]);
 	const [listUserPurchasingUuid, setListUserPurchasingUuid] = useState<string[]>([]);
@@ -62,6 +66,31 @@ function MainDashboard({}: PropsMainDashboard) {
 					status: CONFIG_STATUS.HOAT_DONG,
 				}),
 			}),
+		select(data) {
+			return data;
+		},
+	});
+
+	const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
+		queryFn: () =>
+			httpRequest({
+				isDropdown: true,
+				http: wareServices.listProductType({
+					page: 1,
+					pageSize: 50,
+					keyword: '',
+					status: CONFIG_STATUS.HOAT_DONG,
+					isPaging: CONFIG_PAGING.NO_PAGING,
+					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+					type: [TYPE_PRODUCT.CONG_TY],
+				}),
+			}),
+		onSuccess(data) {
+			if (data) {
+				setProductUuid(data[0]?.uuid);
+			}
+		},
 		select(data) {
 			return data;
 		},
@@ -225,6 +254,12 @@ function MainDashboard({}: PropsMainDashboard) {
 		}
 	}, [listUserPurchasingUuid]);
 
+	// useEffect(() => {
+	// 	if (listProductType?.data?.length > 0) {
+	// 		setProductUuid(listProductType.data[listProductType.data.length - 1].uuid);
+	// 	}
+	// }, [listProductType.data]);
+
 	return (
 		<FlexLayout>
 			<div className={styles.head}>
@@ -292,6 +327,16 @@ function MainDashboard({}: PropsMainDashboard) {
 						}))}
 						name='Tỉnh'
 					/>
+					<SelectFilterState
+						isShowAll={false}
+						uuid={productUuid}
+						setUuid={setProductUuid}
+						listData={listProductType?.data?.map((v: any) => ({
+							uuid: v?.uuid,
+							name: v?.name,
+						}))}
+						placeholder='Loại hàng'
+					/>
 
 					<SelectFilterDate date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
 				</div>
@@ -307,6 +352,7 @@ function MainDashboard({}: PropsMainDashboard) {
 						listPartnerUuid: listPartnerUuid,
 						listUserOwnerUuid: listUserOwnerUuid,
 						listCustomerUuid: listCustomerUuid,
+						productUuid: productUuid,
 					}}
 				>
 					<ChartImportCompany />

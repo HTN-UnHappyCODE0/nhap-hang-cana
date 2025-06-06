@@ -27,7 +27,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 	const [isProductSpec, setIsProductSpec] = useState<string>('1');
 	const [isTransport, setIsTransport] = useState<string>('');
 	const [storageUuid, setStorageUuid] = useState<string>('');
-	const [productUuid, setProductUuid] = useState<string>('');
 	const [specUuid, setSpecUuid] = useState<string>('');
 	const [dataChartMT, setDataChartMT] = useState<any[]>([]);
 	const [dataChartBDMT, setDataChartBDMT] = useState<any[]>([]);
@@ -56,7 +55,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 		lstProductTotal: [],
 	});
 
-	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid} =
+	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid, productUuid} =
 		usePageHomeContext();
 
 	const listStorage = useQuery([QUERY_KEY.dropdown_bai], {
@@ -169,6 +168,13 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						return acc;
 					}, []);
 
+				const weightBDMTAvg =
+					isProductSpec === '2' && specUuid
+						? data?.lstSpecTotal?.find((item: any) => item.productTypeUu?.uuid === specUuid)?.weightBDMTAvg || 0
+						: isProductSpec === '1' && productUuid
+						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.weightBDMTAvg || 0
+						: data?.weightBDMTAvg || 0;
+
 				// Convert data chart
 				const dataConvertMT = data?.lstProductDay?.map((v: any) => {
 					const date =
@@ -197,7 +203,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					}, {});
 
 					const objTotal = {
-						'Trung bình': data?.weightMTAvg || 0,
+						'Trung bình': weightBDMTAvg || 0,
 					};
 
 					return {
@@ -234,7 +240,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					}, {});
 
 					const objTotal = {
-						'Trung bình': data?.weightBDMTAvg || 0,
+						'Trung bình': weightBDMTAvg || 0,
 					};
 
 					return {
@@ -294,12 +300,18 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						: isProductSpec === '1' && productUuid
 						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.drynessAvg || 0
 						: data?.drynessAvg || 0;
+				const weightMTAvg =
+					isProductSpec === '2' && specUuid
+						? data?.lstSpecTotal?.find((item: any) => item.productTypeUu?.uuid === specUuid)?.weightMTAvg || 0
+						: isProductSpec === '1' && productUuid
+						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.weightMTAvg || 0
+						: data?.weightMTAvg || 0;
 
 				setDataTotal({
 					totalWeight: totalWeight,
 					totalWeightBDMT: totalWeightBDMT,
-					weightBDMTAvg: data?.weightBDMTAvg,
-					weightMTAvg: data?.weightMTAvg,
+					weightBDMTAvg: weightBDMTAvg,
+					weightMTAvg: weightMTAvg,
 					drynessAvg: drynessAvg,
 					lstProductTotal: (isProductSpec === '2' ? data?.lstSpecTotal : data?.lstProductTotal)?.map((v: any) => ({
 						name: v?.productTypeUu?.name,
@@ -358,17 +370,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						placeholder='Kiểu'
 					/>
 
-					{isProductSpec == '1' && (
-						<SelectFilterState
-							uuid={productUuid}
-							setUuid={setProductUuid}
-							listData={listProductType?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.name,
-							}))}
-							placeholder='Loại hàng'
-						/>
-					)}
 					{isProductSpec == '2' && (
 						<SelectFilterState
 							uuid={specUuid}
@@ -381,65 +382,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						/>
 					)}
 
-					{/* <SelectFilterState
-						uuid={uuidCompany}
-						setUuid={setUuidCompanyFilter}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Tất cả kv cảng xuất khẩu'
-					/> */}
-					{/* <SelectFilterManyOption
-						splitCondition={(v) => v?.type === 0}
-						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
-						selectedIds={listCompanyUuid}
-						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data}
-						name='Kho'
-					/>
-
-					<SelectFilterMany
-						selectedIds={userPartnerUuid}
-						setSelectedIds={setUserPartnerUuid}
-						listData={listUserPurchasing?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.fullName,
-						}))}
-						name='QLNH'
-					/>
-					<SelectFilterMany
-						selectedIds={listPartnerUuid}
-						setSelectedIds={setListPartnerUuid}
-						listData={listPartner?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Công ty'
-					/>
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<SelectFilterMany
-							selectedIds={userUuid}
-							setSelectedIds={setUserUuid}
-							listData={listUserMarket?.data?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.fullName,
-							}))}
-							name='NVTT'
-						/>
-					</CheckRegencyCode>
-					<SelectFilterMany
-						selectedIds={customerUuid}
-						setSelectedIds={setCustomerUuid}
-						listData={listCustomer?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='NCC'
-					/> */}
 					<SelectFilterState
 						uuid={storageUuid}
 						setUuid={setStorageUuid}
@@ -449,7 +391,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						}))}
 						placeholder='Bãi'
 					/>
-					{/* <SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} /> */}
 
 					<SelectFilterState
 						// isShowAll={true}
@@ -479,17 +420,16 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						<span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span>
 					</span>
 				</p>
-				{((isProductSpec === '2' && !specUuid) || (isProductSpec === '1' && !productUuid)) && (
-					<p className={styles.data_total}>
-						Khối lượng trung bình:{' '}
-						<span>
-							{isShowBDMT === String(TYPE_SHOW_BDMT.MT)
-								? convertWeight(dataTotal?.weightMTAvg)
-								: convertWeight(dataTotal?.weightBDMTAvg)}
-							{/* <span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span> */}
-						</span>
-					</p>
-				)}
+
+				<p className={styles.data_total}>
+					Khối lượng trung bình:{' '}
+					<span>
+						{isShowBDMT === String(TYPE_SHOW_BDMT.MT)
+							? convertWeight(dataTotal?.weightMTAvg)
+							: convertWeight(dataTotal?.weightBDMTAvg)}
+						{/* <span> ({dataTotal?.drynessAvg?.toFixed(2)}%)</span> */}
+					</span>
+				</p>
 
 				{((isProductSpec === '2' && !specUuid) || (isProductSpec === '1' && !productUuid)) && (
 					<>
@@ -545,10 +485,11 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 								<Bar key={i} dataKey={v?.key} stackId='product_type' fill={v?.fill} />
 							))}
 
-						{((isProductSpec === '2' && !specUuid) || (isProductSpec === '1' && !productUuid)) &&
-							productTypes
-								.filter((v) => v.key === 'Trung bình')
-								.map((v, i) => <Line key={`line-${i}`} dataKey='Trung bình' stroke={v?.fill} fill={v?.fill} />)}
+						{productTypes
+							.filter((v) => v.key === 'Trung bình')
+							.map((v, i) => (
+								<Line key={`line-${i}`} dataKey='Trung bình' stroke={v?.fill} fill={v?.fill} />
+							))}
 
 						{/* {productTypes.map((v, i) => (
 							<Line

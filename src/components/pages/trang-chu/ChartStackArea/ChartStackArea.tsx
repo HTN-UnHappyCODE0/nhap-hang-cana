@@ -23,12 +23,11 @@ import SelectFilterState from '~/components/common/SelectFilterState';
 import {usePageHomeContext} from '../context';
 
 function ChartStackArea({}: PropsChartStackArea) {
-	const [productUuid, setProductUuid] = useState<string>('');
 	const [dataChart, setDataChart] = useState<any[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [uuidQuality, setUuidQuality] = useState<string>('');
 
-	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid} =
+	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid, productUuid} =
 		usePageHomeContext();
 
 	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
@@ -217,78 +216,11 @@ function ChartStackArea({}: PropsChartStackArea) {
 	// 	return dataChart;
 	// }, [customerUuid, dataChart]);
 
-	useEffect(() => {
-		if (listProductType?.data?.length > 0) {
-			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid);
-		}
-	}, [listProductType.data]);
-
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
 				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
 				<div className={styles.filter}>
-					{/* <SelectFilterManyOption
-						splitCondition={(v) => v?.type === 0}
-						splitGroupNames={['Kho xuất khẩu', 'Kho trung chuyển']}
-						selectedIds={listCompanyUuid}
-						setSelectedIds={setListCompanyUuid}
-						listData={listCompany?.data}
-						name='Kho'
-					/>
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<SelectFilterMany
-							selectedIds={userPartnerUuid}
-							setSelectedIds={setUserPartnerUuid}
-							listData={listUserPurchasing?.data?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.fullName,
-							}))}
-							name='QLNH'
-						/>
-					</CheckRegencyCode>
-					<SelectFilterMany
-						selectedIds={listPartnerUuid}
-						setSelectedIds={setListPartnerUuid}
-						listData={listPartner?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='Công ty'
-					/>
-					<SelectFilterMany
-						selectedIds={userUuid}
-						setSelectedIds={setUserUuid}
-						listData={listUserMarket?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.fullName,
-						}))}
-						name='NVTT'
-					/>
-					<SelectFilterMany
-						isShowAll={false}
-						selectedIds={customerUuid}
-						setSelectedIds={setCustomerUuid}
-						listData={listCustomer?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						name='NCC'
-					/> */}
-					<SelectFilterState
-						isShowAll={false}
-						uuid={productUuid}
-						setUuid={setProductUuid}
-						listData={listProductType?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Loại hàng'
-					/>
-
 					<SelectFilterState
 						uuid={uuidQuality}
 						setUuid={setUuidQuality}

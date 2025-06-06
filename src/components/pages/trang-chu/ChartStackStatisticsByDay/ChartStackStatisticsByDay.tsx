@@ -26,7 +26,6 @@ import {usePageHomeContext} from '../context';
 function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	const [listStatisticsByDay, setListStatisticsByDay] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [uuidProduct, setUuidProduct] = useState<string>('');
 	const [uuidQuality, setUuidQuality] = useState<string>('');
 	const [uuidStorage, setUuidStorage] = useState<string>('');
 	const [uuidSpec, setUuidSpec] = useState<string>('');
@@ -34,33 +33,33 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	const [productTypes, setProductTypes] = useState<any[]>([]);
 	const [dataChart, setDataChart] = useState<any[]>([]);
 
-	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid} =
+	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid, productUuid} =
 		usePageHomeContext();
 
-	const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: wareServices.listProductType({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					type: [TYPE_PRODUCT.CONG_TY],
-				}),
-			}),
-		onSuccess(data) {
-			if (data) {
-				setUuidProduct(data[0]?.uuid);
-			}
-		},
-		select(data) {
-			return data;
-		},
-	});
+	// const listProductType = useQuery([QUERY_KEY.dropdown_loai_go], {
+	// 	queryFn: () =>
+	// 		httpRequest({
+	// 			isDropdown: true,
+	// 			http: wareServices.listProductType({
+	// 				page: 1,
+	// 				pageSize: 50,
+	// 				keyword: '',
+	// 				status: CONFIG_STATUS.HOAT_DONG,
+	// 				isPaging: CONFIG_PAGING.NO_PAGING,
+	// 				isDescending: CONFIG_DESCENDING.NO_DESCENDING,
+	// 				typeFind: CONFIG_TYPE_FIND.DROPDOWN,
+	// 				type: [TYPE_PRODUCT.CONG_TY],
+	// 			}),
+	// 		}),
+	// 	onSuccess(data) {
+	// 		if (data) {
+	// 			setUuidProduct(data[0]?.uuid);
+	// 		}
+	// 	},
+	// 	select(data) {
+	// 		return data;
+	// 	},
+	// });
 
 	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
 		queryFn: () =>
@@ -86,7 +85,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 		},
 	});
 
-	const listSpecifications = useQuery([QUERY_KEY.dropdown_quy_cach, uuidProduct, uuidQuality], {
+	const listSpecifications = useQuery([QUERY_KEY.dropdown_quy_cach, productUuid, uuidQuality], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
@@ -99,7 +98,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
 					status: CONFIG_STATUS.HOAT_DONG,
 					qualityUuid: uuidQuality,
-					productTypeUuid: uuidProduct,
+					productTypeUuid: productUuid,
 				}),
 			}),
 		// onSuccess(data) {
@@ -148,7 +147,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 			listPartnerUuid,
 			provinceUuid,
 			uuidSpec,
-			uuidProduct,
+			productUuid,
 			uuidQuality,
 			listUserPurchasingUuid,
 			uuidCriteria,
@@ -176,7 +175,7 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						listCompanyUuid: listCompanyUuid,
 						listPartnerUuid: listPartnerUuid,
 						specificationUuid: uuidSpec,
-						productTypeUuid: uuidProduct,
+						productTypeUuid: productUuid,
 						qualityUuid: uuidQuality,
 						criterialUuid: uuidCriteria,
 					}),
@@ -263,13 +262,13 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 	console.log('dataChart', dataChart);
 
 	useEffect(() => {
-		if (uuidProduct) {
+		if (productUuid) {
 			setUuidSpec(listSpecifications?.data?.[0]?.uuid || '');
 		}
 		if (uuidQuality) {
 			setUuidSpec(listSpecifications?.data?.[0]?.uuid || '');
 		}
-	}, [uuidProduct, uuidQuality]);
+	}, [productUuid, uuidQuality]);
 
 	useEffect(() => {
 		if (uuidSpec) {
@@ -330,17 +329,6 @@ function ChartStackStatisticsByDay({}: PropsChartStackStatisticsByDay) {
 						}))}
 						name='NCC'
 					/> */}
-
-					<SelectFilterState
-						isShowAll={false}
-						uuid={uuidProduct}
-						setUuid={setUuidProduct}
-						listData={listProductType?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Loại hàng'
-					/>
 
 					<SelectFilterState
 						isShowAll={false}
