@@ -175,6 +175,13 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.weightBDMTAvg || 0
 						: data?.weightBDMTAvg || 0;
 
+				const weightMTAvg =
+					isProductSpec === '2' && specUuid
+						? data?.lstSpecTotal?.find((item: any) => item.productTypeUu?.uuid === specUuid)?.weightMTAvg || 0
+						: isProductSpec === '1' && productUuid
+						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.weightMTAvg || 0
+						: data?.weightMTAvg || 0;
+
 				// Convert data chart
 				const dataConvertMT = data?.lstProductDay?.map((v: any) => {
 					const date =
@@ -203,7 +210,7 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 					}, {});
 
 					const objTotal = {
-						'Trung bình': weightBDMTAvg || 0,
+						'Trung bình': weightMTAvg || 0,
 					};
 
 					return {
@@ -300,12 +307,6 @@ function ChartImportCompany({}: PropsChartImportCompany) {
 						: isProductSpec === '1' && productUuid
 						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.drynessAvg || 0
 						: data?.drynessAvg || 0;
-				const weightMTAvg =
-					isProductSpec === '2' && specUuid
-						? data?.lstSpecTotal?.find((item: any) => item.productTypeUu?.uuid === specUuid)?.weightMTAvg || 0
-						: isProductSpec === '1' && productUuid
-						? data?.lstProductTotal?.find((item: any) => item.productTypeUu?.uuid === productUuid)?.weightMTAvg || 0
-						: data?.weightMTAvg || 0;
 
 				setDataTotal({
 					totalWeight: totalWeight,
