@@ -1,0 +1,25 @@
+import Head from 'next/head';
+import {Fragment, ReactElement} from 'react';
+import BaseLayout from '~/components/layouts/BaseLayout';
+import WrapperContainer from '~/components/layouts/WrapperContainer';
+import MainPageStatisticsQuality from '~/components/pages/thong-ke-chat-luong/MainPageStatisticsByDay';
+
+export default function Page() {
+	return (
+		<Fragment>
+			<Head>
+				<title>Danh sách thống kê chất lượng</title>
+				<meta name='description' content='Danh sách thống kê chất lượng' />
+				<meta name='viewport' content='width=device-width, initial-scale=1' />
+				<link rel='icon' href='/favicon.ico' />
+			</Head>
+			<WrapperContainer bg={true}>
+				<MainPageStatisticsQuality />
+			</WrapperContainer>
+		</Fragment>
+	);
+}
+
+Page.getLayout = function (Page: ReactElement) {
+	return <BaseLayout title='Quản lý thống kê chất lượng'>{Page}</BaseLayout>;
+};

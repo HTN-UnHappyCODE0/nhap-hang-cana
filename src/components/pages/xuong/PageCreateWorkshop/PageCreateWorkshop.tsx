@@ -43,7 +43,6 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 		email: '',
 		phoneNumber: '',
 		provinceId: '',
-		districtId: '',
 		townId: '',
 		address: '',
 		description: '',
@@ -133,36 +132,20 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 		},
 	});
 
-	const listDistrict = useQuery([QUERY_KEY.dropdown_quan_huyen, form?.provinceId], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: commonServices.listDistrict({
-					keyword: '',
-					status: null,
-					idParent: form?.provinceId,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: !!form?.provinceId,
-	});
-
-	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form.districtId], {
+	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form.provinceId], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
 					status: null,
-					idParent: form.districtId,
+					idParent: form.provinceId,
 				}),
 			}),
 		select(data) {
 			return data;
 		},
-		enabled: !!form?.districtId,
+		enabled: !!form?.provinceId,
 	});
 
 	const listWarehouse = useQuery([QUERY_KEY.dropdown_kho_hang_chinh], {
@@ -200,7 +183,6 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 					name: form.name,
 					phoneNumber: form?.phoneNumber,
 					provinceId: form?.provinceId,
-					districtId: form?.districtId,
 					townId: form?.townId,
 					address: form?.address,
 					userUuid: form?.userUuid,
@@ -545,7 +527,6 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 										setForm((prev: any) => ({
 											...prev,
 											provinceId: v?.matp,
-											districtId: '',
 											townId: '',
 											userUuid: '',
 										}))
@@ -554,44 +535,22 @@ function PageCreateWorkshop({}: PropsPageCreateWorkshop) {
 							))}
 						</Select>
 						<div>
-							<Select
-								isSearch
-								name='districtId'
-								value={form.districtId}
-								placeholder='Chọn quận/huyện'
-								label={<span>Quận/Huyện</span>}
-							>
-								{listDistrict?.data?.map((v: any) => (
+							<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
+								{listTown?.data?.map((v: any) => (
 									<Option
-										key={v?.maqh}
-										value={v?.maqh}
+										key={v?.xaid}
+										value={v?.xaid}
 										title={v?.name}
 										onClick={() =>
 											setForm((prev: any) => ({
 												...prev,
-												districtId: v?.maqh,
-												townId: '',
+												townId: v?.xaid,
 											}))
 										}
 									/>
 								))}
 							</Select>
 						</div>
-						<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
-							{listTown?.data?.map((v: any) => (
-								<Option
-									key={v?.xaid}
-									value={v?.xaid}
-									title={v?.name}
-									onClick={() =>
-										setForm((prev: any) => ({
-											...prev,
-											townId: v?.xaid,
-										}))
-									}
-								/>
-							))}
-						</Select>
 					</div>
 					<div className={clsx('mt')}>
 						<Input

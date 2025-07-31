@@ -44,7 +44,7 @@ interface ScalesStationUu {
 
 interface Truck {
 	code: string;
-	licensePalate: string;
+	licensePlate: string;
 	status: number;
 	uuid: string;
 }

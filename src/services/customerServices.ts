@@ -28,6 +28,7 @@ const customerServices = {
 			companyUuid?: string;
 			listPartnerUUid?: string[];
 			listCompanyUuid?: string[];
+			listUserUuid?: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -77,7 +78,6 @@ const customerServices = {
 			isSift: number | null;
 			typeCus: TYPE_CUSTOMER;
 			transportType: TYPE_TRANSPORT;
-			districtId: string;
 			provinceId: string;
 			townId: string;
 			address: string;

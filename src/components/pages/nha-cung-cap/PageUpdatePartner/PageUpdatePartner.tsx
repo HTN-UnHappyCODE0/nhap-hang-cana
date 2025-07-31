@@ -41,7 +41,6 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 		address: '',
 		phoneNumber: '',
 		provinceId: '',
-		districtId: '',
 		townId: '',
 		userOwenerUuid: '',
 		director: '',
@@ -66,7 +65,6 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 				address: data?.address || '',
 				phoneNumber: data?.phoneNumber || '',
 				provinceId: data?.detailAddress?.province?.uuid || '',
-				districtId: data?.detailAddress?.district?.uuid || '',
 				townId: data?.detailAddress?.town?.uuid || '',
 				userOwenerUuid: data?.userOwnerUu?.uuid || '',
 				director: data?.director || '',
@@ -111,36 +109,20 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 		},
 	});
 
-	const listDistrict = useQuery([QUERY_KEY.dropdown_quan_huyen, form?.provinceId], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: commonServices.listDistrict({
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-					idParent: form?.provinceId,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: !!form?.provinceId,
-	});
-
-	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form?.districtId], {
+	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form?.provinceId], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
 					status: CONFIG_STATUS.HOAT_DONG,
-					idParent: form.districtId,
+					idParent: form.provinceId,
 				}),
 			}),
 		select(data) {
 			return data;
 		},
-		enabled: !!form?.districtId,
+		enabled: !!form?.provinceId,
 	});
 
 	const listRegency = useQuery([QUERY_KEY.dropdown_chuc_vu], {
@@ -200,7 +182,6 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 					email: form?.email,
 					director: form?.director,
 					provinceId: form?.provinceId,
-					districtId: form?.districtId,
 					townId: form?.townId,
 					address: form?.address,
 					description: form?.description,
@@ -379,7 +360,7 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 							placeholder='Nhập số tài khoản'
 						/>
 					</div>
-					<div className={clsx('mt', 'col_3')}>
+					<div className={clsx('mt', 'col_2')}>
 						<Select
 							isSearch
 							name='provinceId'
@@ -396,7 +377,6 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 										setForm((prev: any) => ({
 											...prev,
 											provinceId: v?.matp,
-											districtId: '',
 											townId: '',
 										}))
 									}
@@ -404,44 +384,22 @@ function PageUpdatePartner({}: PropsPageUpdatePartner) {
 							))}
 						</Select>
 						<div>
-							<Select
-								isSearch
-								name='districtId'
-								value={form.districtId}
-								placeholder='Chọn quận/huyện'
-								label={<span>Quận/Huyện</span>}
-							>
-								{listDistrict?.data?.map((v: any) => (
+							<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
+								{listTown?.data?.map((v: any) => (
 									<Option
-										key={v?.maqh}
-										value={v?.maqh}
+										key={v?.xaid}
+										value={v?.xaid}
 										title={v?.name}
 										onClick={() =>
 											setForm((prev: any) => ({
 												...prev,
-												districtId: v?.maqh,
-												townId: '',
+												townId: v?.xaid,
 											}))
 										}
 									/>
 								))}
 							</Select>
 						</div>
-						<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
-							{listTown?.data?.map((v: any) => (
-								<Option
-									key={v?.xaid}
-									value={v?.xaid}
-									title={v?.name}
-									onClick={() =>
-										setForm((prev: any) => ({
-											...prev,
-											townId: v?.xaid,
-										}))
-									}
-								/>
-							))}
-						</Select>
 					</div>
 
 					<div className={clsx('mt')}>

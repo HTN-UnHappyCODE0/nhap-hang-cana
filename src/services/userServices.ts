@@ -33,6 +33,7 @@ const userServices = {
 			regencyUuid: string[];
 			parentUuid?: string | null;
 			provinceIDOwer: string;
+			listParentUuid?: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -66,7 +67,6 @@ const userServices = {
 			linkImage: string;
 			ownerUuid: string;
 			provinceId: string;
-			districtId: string;
 			townId: string;
 			provinceOwnerId: string;
 		},

@@ -5,12 +5,14 @@ import clsx from 'clsx';
 import styles from './Table.module.scss';
 
 function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}: PropsTable) {
-	const myElementRef = useRef<any>(null);
+	const tableContainerRef = useRef<any>(null);
 	const [isShowScroll, setIsShowScroll] = useState<boolean>(false);
+	const thRefs = useRef<(HTMLTableHeaderCellElement | null)[]>([]);
+	const [columnWidths, setColumnWidths] = useState<number[]>([]);
 
 	const checkForHorizontalScroll = () => {
-		const element = myElementRef.current;
-		if (element.scrollWidth > element.clientWidth) {
+		const element = tableContainerRef.current;
+		if (element?.scrollWidth > element?.clientWidth) {
 			setIsShowScroll(true);
 		} else {
 			setIsShowScroll(false);
@@ -73,8 +75,52 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 		setSelectedRow(index);
 	};
 
+	//fixed
+	useEffect(() => {
+		const updateColumnWidths = () => {
+			if (thRefs.current.length > 0) {
+				const widths = thRefs.current.map((th) => th?.offsetWidth || 0);
+				setColumnWidths(widths);
+			}
+		};
+
+		updateColumnWidths();
+		window.addEventListener('resize', updateColumnWidths);
+		return () => {
+			window.removeEventListener('resize', updateColumnWidths);
+		};
+	}, [data]);
+
+	const fixedLeftPositions = useMemo(() => {
+		let left = 0;
+		return column.map((col, index) => {
+			if (col.fixedLeft) {
+				const position = left;
+				left += columnWidths[index] || 0;
+				return position;
+			}
+			return null;
+		});
+	}, [column, columnWidths]);
+
+	const fixedRightPositions = useMemo(() => {
+		let right = 0;
+		return column
+			.slice()
+			.reverse()
+			.map((col, index) => {
+				if (col.fixedRight) {
+					const position = right;
+					right += columnWidths[column.length - 1 - index] || 0;
+					return position;
+				}
+				return null;
+			})
+			.reverse();
+	}, [column, columnWidths]);
+
 	return (
-		<div ref={myElementRef} className={clsx(styles.container, {[styles.fixedHeader]: fixedHeader})}>
+		<div ref={tableContainerRef} className={clsx(styles.container, {[styles.fixedHeader]: fixedHeader})}>
 			<table>
 				<thead>
 					<tr>
@@ -83,15 +129,24 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 
 							return (
 								<th
-									className={clsx({
-										[styles.checkBox]: col.checkBox,
-										[styles.textEnd]: col.textAlign == 'end',
-										[styles.textStart]: col.textAlign == 'start',
-										[styles.textCenter]: col.textAlign == 'center',
-										[styles.fixedLeft]: col.fixedLeft && isShowScroll,
-										[styles.fixedRight]: col.fixedRight && isShowScroll,
-									})}
+									className={clsx(
+										{
+											[styles.checkBox]: col.checkBox,
+											[styles.textEnd]: col.textAlign == 'end',
+											[styles.textStart]: col.textAlign == 'start',
+											[styles.textCenter]: col.textAlign == 'center',
+										},
+										col.fixedLeft && styles.fixedLeft,
+										col.fixedRight && styles.fixedRight
+									)}
 									key={i}
+									ref={(el) => {
+										thRefs.current[i] = el;
+									}}
+									style={{
+										...(col.fixedLeft ? {left: fixedLeftPositions[i] || 0} : {}),
+										...(col.fixedRight ? {right: fixedRightPositions[i] || 0} : {}),
+									}}
 								>
 									<div className={styles.title_check_box}>
 										{col.checkBox && !isTitle ? (
@@ -119,14 +174,22 @@ function Table({data, column, onSetData, fixedHeader = false, isDisableCheckBox}
 									<td
 										key={colIndex}
 										onClick={!col.selectRow ? () => handleRowClick(rowIndex) : (e) => e.stopPropagation()}
-										className={clsx({
-											[styles.selectedRow]: selectedRow === rowIndex,
-											[styles.isTitleRow]: isTitle,
-											[styles.fixedLeft]: col.fixedLeft && isShowScroll,
-											[styles.fixedRight]: col.fixedRight && isShowScroll,
-											[styles.stickyHeader]: col.fixedLeft && isTitle,
-											[styles.stickyHeader1]: col.fixedRight && isTitle,
-										})}
+										className={clsx(
+											{
+												[styles.selectedRow]: selectedRow === rowIndex,
+												[styles.isTitleRow]: isTitle,
+												[styles.fixedLeft]: col.fixedLeft && isShowScroll,
+												[styles.fixedRight]: col.fixedRight && isShowScroll,
+												[styles.stickyHeader]: col.fixedLeft && isTitle,
+												[styles.stickyHeader1]: col.fixedRight && isTitle,
+											},
+											col.fixedLeft && styles.fixedLeft,
+											col.fixedRight && styles.fixedRight
+										)}
+										style={{
+											...(col.fixedLeft ? {left: fixedLeftPositions[colIndex] || 0} : {}),
+											...(col.fixedRight ? {right: fixedRightPositions[colIndex] || 0} : {}),
+										}}
 									>
 										<div
 											className={clsx(col.className, {

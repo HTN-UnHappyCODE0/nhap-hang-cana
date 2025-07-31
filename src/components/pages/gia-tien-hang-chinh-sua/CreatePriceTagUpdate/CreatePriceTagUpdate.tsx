@@ -174,9 +174,11 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 					qualityUuid: '',
 					scalesStationUuid: '',
 					typeCheckDay: 0,
-					truckUuid: [],
+					truckPlates: [],
 					customerUuid: '',
 					listCustomerUuid: form?.customerUuid ? [form.customerUuid] : [],
+					storageUuid: '',
+					companyUuid: '',
 				}),
 			}),
 		onSuccess(data) {
@@ -246,7 +248,6 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 
 		return funcFixPricetag.mutate();
 	};
-	console.log({form});
 
 	return (
 		<div className={styles.container}>
@@ -582,7 +583,7 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 						<div className={styles.filter}>
 							<FilterCustom
 								isSearch
-								name='Nhà cung cấp'
+								name='NCC'
 								query='_partnerUuid'
 								listFilter={listPartner?.data?.map((v: any) => ({
 									id: v?.uuid,
@@ -593,7 +594,7 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 						<div className={styles.filter}>
 							<FilterCustom
 								isSearch
-								name='Nhà cung cấp'
+								name='NCC'
 								query='_customerUuid'
 								listFilter={listCustomer?.data?.map((v: any) => ({
 									id: v?.uuid,

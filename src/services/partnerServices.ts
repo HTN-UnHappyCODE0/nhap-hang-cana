@@ -15,6 +15,7 @@ const partnerServices = {
 			provinceId: string;
 			type: number | null;
 			listCompanyUuid?: string[];
+			listUserUuid?: string[];
 		},
 		tokenAxios?: any
 	) => {
@@ -42,7 +43,6 @@ const partnerServices = {
 			phoneNumber: string;
 			email: string;
 			director: string;
-			districtId: string;
 			provinceId: string;
 			townId: string;
 			address: string;

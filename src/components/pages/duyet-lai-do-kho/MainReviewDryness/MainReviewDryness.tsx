@@ -147,7 +147,7 @@ function MainReviewDryness({}: PropsMainReviewDryness) {
 					// specUuid: !!_specUuid ? (_specUuid as string) : null,
 
 					// storageUuid: '',
-					// truckUuid: '',
+					// truckPlate: '',
 					// timeStart: _dateFrom ? (_dateFrom as string) : null,
 					// timeEnd: _dateTo ? (_dateTo as string) : null,
 					// customerUuid: _customerUuid ? (_customerUuid as string) : '',

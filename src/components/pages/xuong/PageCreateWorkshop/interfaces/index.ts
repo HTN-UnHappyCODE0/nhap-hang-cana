@@ -8,7 +8,6 @@ export interface IFormCreateWorkshop {
 	email: string;
 	phoneNumber: string;
 	provinceId: string;
-	districtId: string;
 	partnerUuid: string;
 	townId: string;
 	address: string;

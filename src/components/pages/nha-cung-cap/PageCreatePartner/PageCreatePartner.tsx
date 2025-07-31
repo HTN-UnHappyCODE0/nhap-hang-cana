@@ -38,7 +38,6 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 		address: '',
 		phoneNumber: '',
 		provinceId: '',
-		districtId: '',
 		townId: '',
 		userOwenerUuid: '',
 		director: '',
@@ -77,20 +76,20 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 		enabled: !!form?.provinceId,
 	});
 
-	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form?.districtId], {
+	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form?.provinceId], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
 					status: null,
-					idParent: form.districtId,
+					idParent: form.provinceId,
 				}),
 			}),
 		select(data) {
 			return data;
 		},
-		enabled: !!form?.districtId,
+		enabled: !!form?.provinceId,
 	});
 
 	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
@@ -169,7 +168,6 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 					email: form?.email,
 					director: form?.director,
 					provinceId: form?.provinceId,
-					districtId: form?.districtId,
 					townId: form?.townId,
 					address: form?.address,
 					description: form?.description,
@@ -190,7 +188,6 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 					address: '',
 					phoneNumber: '',
 					provinceId: '',
-					districtId: '',
 					townId: '',
 					userOwenerUuid: '',
 					director: '',
@@ -362,7 +359,7 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 							placeholder='Nhập số tài khoản'
 						/>
 					</div>
-					<div className={clsx('mt', 'col_3')}>
+					<div className={clsx('mt', 'col_2')}>
 						<Select
 							isSearch
 							name='provinceId'
@@ -379,7 +376,6 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 										setForm((prev: any) => ({
 											...prev,
 											provinceId: v?.matp,
-											districtId: '',
 											townId: '',
 										}))
 									}
@@ -387,44 +383,22 @@ function PageCreatePartner({}: PropsPageCreatePartner) {
 							))}
 						</Select>
 						<div>
-							<Select
-								isSearch
-								name='districtId'
-								value={form.districtId}
-								placeholder='Chọn quận/huyện'
-								label={<span>Quận/Huyện</span>}
-							>
-								{listDistrict?.data?.map((v: any) => (
+							<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
+								{listTown?.data?.map((v: any) => (
 									<Option
-										key={v?.maqh}
-										value={v?.maqh}
+										key={v?.xaid}
+										value={v?.xaid}
 										title={v?.name}
 										onClick={() =>
 											setForm((prev: any) => ({
 												...prev,
-												districtId: v?.maqh,
-												townId: '',
+												townId: v?.xaid,
 											}))
 										}
 									/>
 								))}
 							</Select>
 						</div>
-						<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
-							{listTown?.data?.map((v: any) => (
-								<Option
-									key={v?.xaid}
-									value={v?.xaid}
-									title={v?.name}
-									onClick={() =>
-										setForm((prev: any) => ({
-											...prev,
-											townId: v?.xaid,
-										}))
-									}
-								/>
-							))}
-						</Select>
 					</div>
 
 					<div className={clsx('mt')}>

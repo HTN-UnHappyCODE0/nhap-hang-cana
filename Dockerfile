@@ -18,8 +18,8 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 
-ENV PORT=9090
+ENV PORT=4354
 
-EXPOSE 9090
+EXPOSE 4354
 
 CMD ["node", "server.js"]

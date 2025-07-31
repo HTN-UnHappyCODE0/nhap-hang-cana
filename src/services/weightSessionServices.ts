@@ -23,8 +23,8 @@ const weightSessionServices = {
 			productTypeUuid?: string | null;
 			shift?: number | null;
 			shipUuid?: string;
-			truckUuid: string;
-			listTruckUuid: string[];
+			truckPlate: string;
+			listTruckplate: string[];
 			customerUuid: string;
 			listCustomerUuid: string[];
 		},
@@ -80,7 +80,7 @@ const weightSessionServices = {
 			isPaging: CONFIG_PAGING;
 			scalesType: number[];
 			billUuid: string;
-			truckUuid: string[];
+			truckPlate: string[];
 			storageUuid: string;
 			customerUuid: string;
 			productTypeUuid: string;
@@ -110,8 +110,8 @@ const weightSessionServices = {
 			isPaging: CONFIG_PAGING;
 			scalesType: number[];
 			billUuid: string;
-			truckUuid: string;
-			listTruckUuid: string[];
+			truckPlate: string;
+			listTruckplate: string[];
 			storageUuid: string;
 			productTypeUuid: string;
 			shipUuid: string;

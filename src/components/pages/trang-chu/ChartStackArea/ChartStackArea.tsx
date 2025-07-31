@@ -1,10 +1,8 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {PropsChartStackArea} from './interfaces';
 import styles from './ChartStackArea.module.scss';
 import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
-import CheckRegencyCode from '~/components/protected/CheckRegencyCode';
-import SelectFilterOption from '../SelectFilterOption';
 import {useQuery} from '@tanstack/react-query';
 import {
 	CONFIG_DESCENDING,
@@ -12,95 +10,25 @@ import {
 	CONFIG_STATUS,
 	CONFIG_TYPE_FIND,
 	QUERY_KEY,
-	REGENCY_CODE,
-	REGENCY_NAME,
-	STATUS_CUSTOMER,
-	TYPE_CUSTOMER,
-	TYPE_DATE,
 	TYPE_DATE_SHOW,
-	TYPE_PARTNER,
 	TYPE_PRODUCT,
 } from '~/constants/config/enum';
 import {httpRequest} from '~/services';
-import customerServices from '~/services/customerServices';
-import userServices from '~/services/userServices';
-import regencyServices from '~/services/regencyServices';
 import priceTagServices from '~/services/priceTagServices';
-import SelectFilterDate from '../SelectFilterDate';
 import {timeSubmit} from '~/common/funcs/optionConvert';
-import companyServices from '~/services/companyServices';
 import moment from 'moment';
 import {convertCoin} from '~/common/funcs/convertCoin';
 import wareServices from '~/services/wareServices';
-import Loading from '~/components/common/Loading';
-import commonServices from '~/services/commonServices';
-import SelectFilterMany from '../SelectFilterMany';
-import partnerServices from '~/services/partnerServices';
+import SelectFilterState from '~/components/common/SelectFilterState';
+import {usePageHomeContext} from '../context';
 
 function ChartStackArea({}: PropsChartStackArea) {
-	const [customerUuid, setCustomerUuid] = useState<string[]>([]);
-	const [productUuid, setProductUuid] = useState<string>('');
-	const [userUuid, setUserUuid] = useState<string>('');
-	const [uuidCompany, setUuidCompanyFilter] = useState<string[]>([]);
-	const [typeDate, setTypeDate] = useState<number | null>(TYPE_DATE.THIS_YEAR);
-	const [provinceUuid, setProvinceUuid] = useState<string[]>([]);
-	const [date, setDate] = useState<{
-		from: Date | null;
-		to: Date | null;
-	} | null>(null);
 	const [dataChart, setDataChart] = useState<any[]>([]);
 	const [productTypes, setProductTypes] = useState<any[]>([]);
-	const [listPartnerUuid, setListPartnerUuid] = useState<any[]>([]);
 	const [uuidQuality, setUuidQuality] = useState<string>('');
 
-	const listCustomer = useQuery([QUERY_KEY.dropdown_khach_hang_nhap, uuidCompany, listPartnerUuid], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: customerServices.listCustomer({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.TABLE,
-					partnerUUid: '',
-					userUuid: '',
-					status: STATUS_CUSTOMER.HOP_TAC,
-					typeCus: TYPE_CUSTOMER.NHA_CUNG_CAP,
-					provinceId: '',
-					specUuid: '',
-					listCompanyUuid: uuidCompany,
-					listPartnerUUid: listPartnerUuid,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listPartner = useQuery([QUERY_KEY.dropdown_nha_cung_cap, uuidCompany], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: partnerServices.listPartner({
-					pageSize: 50,
-					page: 1,
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					userUuid: '',
-					provinceId: '',
-					type: TYPE_PARTNER.NCC,
-					listCompanyUuid: uuidCompany,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
+	const {date, provinceUuid, listCompanyUuid, listUserPurchasingUuid, listPartnerUuid, listUserOwnerUuid, listCustomerUuid, productUuid} =
+		usePageHomeContext();
 
 	const listQuality = useQuery([QUERY_KEY.dropdown_quoc_gia], {
 		queryFn: () =>
@@ -141,93 +69,18 @@ function ChartStackArea({}: PropsChartStackArea) {
 		},
 	});
 
-	const listCompany = useQuery([QUERY_KEY.dropdown_cong_ty], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: companyServices.listCompany({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listProvince = useQuery([QUERY_KEY.dropdown_tinh_thanh_pho], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: commonServices.listProvince({
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-
-	const listRegency = useQuery([QUERY_KEY.dropdown_chuc_vu], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: regencyServices.listRegency({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-	});
-	const listUser = useQuery([QUERY_KEY.dropdown_nguoi_quan_ly], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: userServices.listUser({
-					page: 1,
-					pageSize: 50,
-					keyword: '',
-					isPaging: CONFIG_PAGING.NO_PAGING,
-					isDescending: CONFIG_DESCENDING.NO_DESCENDING,
-					typeFind: CONFIG_TYPE_FIND.DROPDOWN,
-					status: CONFIG_STATUS.HOAT_DONG,
-					provinceIDOwer: '',
-					regencyUuid: listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])
-						? listRegency?.data?.find((v: any) => v?.code == REGENCY_NAME['Quản lý nhập hàng'])?.uuid
-						: null,
-					regencyUuidExclude: '',
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: listRegency.isSuccess,
-	});
-
 	const dataBoardDailyPrice = useQuery(
 		[
 			QUERY_KEY.thong_ke_bieu_do_gia_tien_theo_ngay,
 			productUuid,
-			customerUuid,
+			listCustomerUuid,
 			date,
-			userUuid,
-			uuidCompany,
+			listUserOwnerUuid,
+			listCompanyUuid,
 			listPartnerUuid,
 			provinceUuid,
 			uuidQuality,
+			listUserPurchasingUuid,
 		],
 		{
 			queryFn: () =>
@@ -236,14 +89,15 @@ function ChartStackArea({}: PropsChartStackArea) {
 					http: priceTagServices.dashBoardDailyPrice({
 						timeStart: timeSubmit(date?.from)!,
 						timeEnd: timeSubmit(date?.to, true)!,
-						userOwnerUuid: userUuid,
+						userOwnerUuid: listUserOwnerUuid,
 						transportType: null,
 						productTypeUuid: productUuid,
-						customerUuid: customerUuid,
-						listCompanyUuid: uuidCompany,
+						customerUuid: listCustomerUuid,
+						listCompanyUuid: listCompanyUuid,
 						listPartnerUuid: listPartnerUuid,
 						provinceId: provinceUuid,
 						qualityUUid: uuidQuality,
+						userPartnerUuid: listUserPurchasingUuid,
 					}),
 				}),
 			onSuccess({data}) {
@@ -341,125 +195,40 @@ function ChartStackArea({}: PropsChartStackArea) {
 				// 	})),
 				// });
 			},
+			enabled: !!date?.from && !!date?.to,
 		}
 	);
 
-	const filteredProductTypes = useMemo(() => {
-		if (customerUuid?.length === 0) {
-			return productTypes.filter((v) => v.key !== 'Khách hàng');
-		}
-		return productTypes;
-	}, [customerUuid, productTypes]);
+	// const filteredProductTypes = useMemo(() => {
+	// 	if (customerUuid?.length === 0) {
+	// 		return productTypes.filter((v) => v.key !== 'Khách hàng');
+	// 	}
+	// 	return productTypes;
+	// }, [customerUuid, productTypes]);
 
-	const filteredDataChart = useMemo(() => {
-		if (customerUuid?.length === 0) {
-			return dataChart?.map((item) => {
-				const {'Khách hàng': _, ...rest} = item;
-				return rest;
-			});
-		}
-		return dataChart;
-	}, [customerUuid, dataChart]);
-
-	useEffect(() => {
-		if (uuidCompany) {
-			setCustomerUuid([]);
-		}
-		if (listPartnerUuid) {
-			setCustomerUuid([]);
-		}
-	}, [uuidCompany, listPartnerUuid]);
-
-	useEffect(() => {
-		if (uuidCompany) {
-			setListPartnerUuid([]);
-		}
-	}, [uuidCompany]);
-
-	useEffect(() => {
-		if (listProductType?.data?.length > 0) {
-			setProductUuid(listProductType.data[listProductType.data.length - 1].uuid); // để
-		}
-	}, [listProductType.data]);
-
-	console.log('abc', uuidCompany);
+	// const filteredDataChart = useMemo(() => {
+	// 	if (customerUuid?.length === 0) {
+	// 		return dataChart?.map((item) => {
+	// 			const {'Khách hàng': _, ...rest} = item;
+	// 			return rest;
+	// 		});
+	// 	}
+	// 	return dataChart;
+	// }, [customerUuid, dataChart]);
 
 	return (
 		<div className={styles.container}>
 			<div className={styles.head}>
 				<h3>Biểu đồ giá tiền nhập hàng (VNĐ)</h3>
 				<div className={styles.filter}>
-					<SelectFilterMany
-						selectedIds={uuidCompany}
-						setSelectedIds={setUuidCompanyFilter}
-						listData={listCompany?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Tất cả kv cảng xuất khẩu'
-					/>
-					<SelectFilterMany
-						selectedIds={listPartnerUuid}
-						setSelectedIds={setListPartnerUuid}
-						listData={listPartner?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Công ty'
-					/>
-					<SelectFilterMany
-						isShowAll={false}
-						selectedIds={customerUuid}
-						setSelectedIds={setCustomerUuid}
-						listData={listCustomer?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Chọn nhà cung cấp'
-					/>
-					<SelectFilterOption
-						isShowAll={false}
-						uuid={productUuid}
-						setUuid={setProductUuid}
-						listData={listProductType?.data?.map((v: any) => ({
-							uuid: v?.uuid,
-							name: v?.name,
-						}))}
-						placeholder='Tất cả loại hàng'
-					/>
-					<SelectFilterDate isOptionDateAll={false} date={date} setDate={setDate} typeDate={typeDate} setTypeDate={setTypeDate} />
-					<CheckRegencyCode
-						isPage={false}
-						regencys={[REGENCY_CODE.GIAM_DOC, REGENCY_CODE.PHO_GIAM_DOC, REGENCY_CODE.QUAN_LY_NHAP_HANG]}
-					>
-						<SelectFilterOption
-							uuid={userUuid}
-							setUuid={setUserUuid}
-							listData={listUser?.data?.map((v: any) => ({
-								uuid: v?.uuid,
-								name: v?.fullName,
-							}))}
-							placeholder='Tất cả người quản lý mua hàng'
-						/>
-					</CheckRegencyCode>
-
-					<SelectFilterMany
-						selectedIds={provinceUuid}
-						setSelectedIds={setProvinceUuid}
-						listData={listProvince?.data?.map((v: any) => ({
-							uuid: v?.matp,
-							name: v?.name,
-						}))}
-						placeholder='Tất cả tỉnh thành'
-					/>
-					<SelectFilterOption
+					<SelectFilterState
 						uuid={uuidQuality}
 						setUuid={setUuidQuality}
 						listData={listQuality?.data?.map((v: any) => ({
 							uuid: v?.uuid,
 							name: v?.name,
 						}))}
-						placeholder='Tất cả quốc gia'
+						placeholder='Quốc gia'
 					/>
 				</div>
 			</div>
@@ -516,7 +285,13 @@ function ChartStackArea({}: PropsChartStackArea) {
 					>
 						<CartesianGrid strokeDasharray='3 3' />
 						<XAxis dataKey='name' scale='point' padding={{left: 40}} />
-						<YAxis domain={[2000000, 'dataMax']} tickFormatter={(value) => convertCoin(value)} />
+						<YAxis
+							domain={[
+								dataBoardDailyPrice?.data?.data?.priceMin - 100000,
+								dataBoardDailyPrice?.data?.data?.priceMax + 100000,
+							]}
+							tickFormatter={(value) => convertCoin(value)}
+						/>
 						<Tooltip formatter={(value) => convertCoin(Number(value))} />
 
 						{productTypes.map((v) => (

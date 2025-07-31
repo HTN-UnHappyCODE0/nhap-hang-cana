@@ -261,7 +261,7 @@ const priceTagServices = {
 		data: {
 			timeStart: string;
 			timeEnd: string;
-			userOwnerUuid: string;
+			userOwnerUuid: string[];
 			productTypeUuid: string;
 			typeFindDay?: number;
 			transportType: number | null;
@@ -270,6 +270,7 @@ const priceTagServices = {
 			customerUuid: string[];
 			listCompanyUuid: string[];
 			listPartnerUuid: string[];
+			userPartnerUuid: string[];
 		},
 		tokenAxios?: any
 	) => {

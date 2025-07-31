@@ -12,6 +12,7 @@
 	cursor: pointer;
 	user-select: none;
 	transition: 0.3s;
+	background: #fff;
 
 	&:hover {
 		background: #fff;
@@ -52,4 +53,8 @@
 		font-weight: 500;
 		flex: 1;
 	}
+}
+
+.value {
+	font-weight: 600;
 }

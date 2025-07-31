@@ -33,7 +33,7 @@ const rfidServices = {
 		data: {
 			uuid: string;
 			code: string;
-			truckUuid: string;
+			truckPlate: string;
 			description: string;
 		},
 		tokenAxios?: any
