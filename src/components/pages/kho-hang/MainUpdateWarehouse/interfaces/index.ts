@@ -6,7 +6,6 @@ export interface IFormUpdateWarehouse {
 	address: string;
 	scaleStationUuid: string;
 	provinceId: string;
-	dictrictId: string;
 	townId: string;
 	description: string;
 	companyUuid: string;

@@ -10,7 +10,6 @@ export interface IFormUpdatePartner {
 	bankName: string;
 	bankAccount: string;
 	provinceId: string;
-	districtId: string;
 	townId: string;
 	address: string;
 	description: string;

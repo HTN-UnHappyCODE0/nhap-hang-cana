@@ -50,7 +50,7 @@ function TableImport({uuid}: PropsTableImport) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const [isHaveDryness, setIsHaveDryness] = useState<string>('');
-	const [truckUuid, setTruckUuid] = useState<string[]>([]);
+	const [truckPlate, setTruckPlate] = useState<string[]>([]);
 
 	const [openWeighReject, setOpenWeighReject] = useState<string | null>(null);
 
@@ -252,7 +252,7 @@ function TableImport({uuid}: PropsTableImport) {
 			uuidStorage,
 			_scalesStationUuid,
 			isHaveDryness,
-			truckUuid,
+			truckPlate,
 			uuidCompany,
 			uuidQuality,
 			listCompanyUuid,
@@ -302,7 +302,7 @@ function TableImport({uuid}: PropsTableImport) {
 						scalesStationUuid: (_scalesStationUuid as string) || '',
 						storageUuid: uuidStorage,
 						isHaveDryness: isHaveDryness ? Number(isHaveDryness) : null,
-						truckUuid: truckUuid,
+						truckPlates: truckPlate,
 						customerUuid: '',
 						listCustomerUuid: [uuid as string],
 						companyUuid: uuidCompany,
@@ -532,7 +532,7 @@ function TableImport({uuid}: PropsTableImport) {
 								uuidStorage,
 								_scalesStationUuid,
 								isHaveDryness,
-								truckUuid,
+								truckPlate,
 								uuidCompany,
 								uuidQuality,
 								listCompanyUuid,

@@ -29,7 +29,6 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 		address: '',
 		scaleStationUuid: '',
 		provinceId: '',
-		dictrictId: '',
 		townId: '',
 		description: '',
 		companyUuid: '',
@@ -110,36 +109,20 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 		},
 	});
 
-	const listDistrict = useQuery([QUERY_KEY.dropdown_quan_huyen, form?.provinceId], {
-		queryFn: () =>
-			httpRequest({
-				isDropdown: true,
-				http: commonServices.listDistrict({
-					keyword: '',
-					status: CONFIG_STATUS.HOAT_DONG,
-					idParent: form?.provinceId,
-				}),
-			}),
-		select(data) {
-			return data;
-		},
-		enabled: !!form?.provinceId,
-	});
-
-	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form.dictrictId], {
+	const listTown = useQuery([QUERY_KEY.dropdown_xa_phuong, form.provinceId], {
 		queryFn: () =>
 			httpRequest({
 				isDropdown: true,
 				http: commonServices.listTown({
 					keyword: '',
 					status: CONFIG_STATUS.HOAT_DONG,
-					idParent: form.dictrictId,
+					idParent: form.provinceId,
 				}),
 			}),
 		select(data) {
 			return data;
 		},
-		enabled: !!form?.dictrictId,
+		enabled: !!form?.provinceId,
 	});
 
 	const funcUpdateWarehouse = useMutation({
@@ -152,7 +135,6 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 					uuid: form.uuid,
 					name: form.name,
 					provinceId: form.provinceId,
-					dictrictId: form.dictrictId,
 					townId: form.townId,
 					address: form.address,
 					description: form.description,
@@ -172,15 +154,6 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 	});
 
 	const handleSubmit = async () => {
-		if (!form.provinceId) {
-			return toastWarn({msg: 'Vui lòng chọn tỉnh/thành phố!'});
-		}
-		if (!form.dictrictId) {
-			return toastWarn({msg: 'Vui lòng chọn quận/huyện!'});
-		}
-		if (!form.townId) {
-			return toastWarn({msg: 'Vui lòng chọn xã/phường!'});
-		}
 		if (!form.companyUuid) {
 			return toastWarn({msg: 'Vui lòng chọn KV cảng xuất khẩu!'});
 		}
@@ -271,17 +244,13 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 							</Select>
 						</div>
 					</div>
-					<div className={clsx('mt', 'col_3')}>
+					<div className={clsx('mt', 'col_2')}>
 						<Select
 							isSearch
 							name='provinceId'
 							value={form.provinceId}
 							placeholder='Chọn tỉnh/thành phố'
-							label={
-								<span>
-									Tỉnh/Thành phố<span style={{color: 'red'}}>*</span>
-								</span>
-							}
+							label={<span>Tỉnh/Thành phố</span>}
 						>
 							{listProvince?.data?.map((v: any) => (
 								<Option
@@ -292,7 +261,6 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 										setForm((prev: any) => ({
 											...prev,
 											provinceId: v?.matp,
-											dictrictId: '',
 											townId: '',
 										}))
 									}
@@ -300,58 +268,22 @@ function MainUpdateWarehouse({}: PropsMainUpdateWarehouse) {
 							))}
 						</Select>
 						<div>
-							<Select
-								isSearch
-								name='dictrictId'
-								value={form.dictrictId}
-								placeholder='Chọn quận/huyện'
-								label={
-									<span>
-										Quận/Huyện<span style={{color: 'red'}}>*</span>
-									</span>
-								}
-							>
-								{listDistrict?.data?.map((v: any) => (
+							<Select isSearch name='townId' value={form.townId} placeholder='Chọn xã/phường' label={<span>Xã/phường</span>}>
+								{listTown?.data?.map((v: any) => (
 									<Option
-										key={v?.maqh}
-										value={v?.maqh}
+										key={v?.xaid}
+										value={v?.xaid}
 										title={v?.name}
 										onClick={() =>
 											setForm((prev: any) => ({
 												...prev,
-												dictrictId: v?.maqh,
-												townId: '',
+												townId: v?.xaid,
 											}))
 										}
 									/>
 								))}
 							</Select>
 						</div>
-						<Select
-							isSearch
-							name='townId'
-							value={form.townId}
-							placeholder='Chọn xã/phường'
-							label={
-								<span>
-									Xã/phường<span style={{color: 'red'}}>*</span>
-								</span>
-							}
-						>
-							{listTown?.data?.map((v: any) => (
-								<Option
-									key={v?.xaid}
-									value={v?.xaid}
-									title={v?.name}
-									onClick={() =>
-										setForm((prev: any) => ({
-											...prev,
-											townId: v?.xaid,
-										}))
-									}
-								/>
-							))}
-						</Select>
 					</div>
 					<div className={clsx('mt')}>
 						<Input

@@ -10,7 +10,6 @@ export interface IFormUpdateWorkshop {
 	email: string;
 	phoneNumber: string;
 	provinceId: string;
-	districtId: string;
 	townId: string;
 	address: string;
 	description: string;

@@ -174,7 +174,7 @@ function CreatePriceTagUpdate({}: PropsCreatePriceTagUpdate) {
 					qualityUuid: '',
 					scalesStationUuid: '',
 					typeCheckDay: 0,
-					truckUuid: [],
+					truckPlates: [],
 					customerUuid: '',
 					listCustomerUuid: form?.customerUuid ? [form.customerUuid] : [],
 					storageUuid: '',
